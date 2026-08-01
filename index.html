@@ -1,0 +1,1132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GM Energy Prep — Coding Practice Lab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#F2F6F7; --surface:#FFFFFF; --ink:#14232E; --muted:#5C6B76;
+    --line:#DDE6EA; --charge:#0E8A5F; --charge-soft:#E2F3EC;
+    --fail:#B4472F; --fail-soft:#FBE8E4; --warn:#E0A100; --warn-soft:#FBF3DC;
+    --editor-bg:#12222C; --editor-ink:#DCE7EC;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--ink);font-family:'IBM Plex Sans',sans-serif;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:1100px;margin:0 auto;padding:18px 14px 60px}
+  .eyebrow{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--charge);margin-bottom:5px}
+  h1{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:24px;letter-spacing:-.01em}
+  .sub{color:var(--muted);font-size:13.5px;margin-top:3px}
+
+  .statusbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:10px 14px;margin:14px 0}
+  .solvedcount{font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--muted)}
+  .solvedcount b{color:var(--charge);font-size:14px}
+  .timer{font-family:'IBM Plex Mono',monospace;font-size:15px;font-weight:600;font-variant-numeric:tabular-nums;margin-left:auto}
+  .timer.over{color:var(--fail)}
+
+  .layout{display:grid;grid-template-columns:290px 1fr;gap:14px;align-items:start}
+  @media (max-width:880px){ .layout{grid-template-columns:1fr} }
+
+  .list{background:var(--surface);border:1px solid var(--line);border-radius:10px;overflow:hidden;max-height:80vh;overflow-y:auto}
+  .list-group{font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);padding:10px 12px 5px;background:var(--bg);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:1}
+  .p-item{display:flex;align-items:center;gap:7px;padding:9px 12px;border-bottom:1px solid var(--line);cursor:pointer;font-size:13.5px}
+  .p-item:hover{background:#F7FAFB}
+  .p-item.active{background:var(--charge-soft);box-shadow:inset 3px 0 0 var(--charge)}
+  .p-item .tick{width:14px;font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--charge);flex-shrink:0}
+  .p-item .p-name{flex:1;line-height:1.3}
+  .diff{font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.05em;padding:1px 5px;border-radius:4px;flex-shrink:0}
+  .d-Easy{background:#E7F2EF;color:#0E7458}
+  .d-Medium{background:#FCEEE3;color:#A85A1E}
+  .d-Hard{background:#FBE8E4;color:#A83A24}
+  .mine{font-family:'IBM Plex Mono',monospace;font-size:9px;background:#EDEDF5;color:#4A4A80;padding:1px 4px;border-radius:3px;flex-shrink:0}
+
+  .panel{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px 18px}
+  .p-title{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:19px;margin-bottom:4px}
+  .p-meta{display:flex;gap:7px;align-items:center;margin-bottom:12px;flex-wrap:wrap}
+  .p-tag{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.06em;background:#EEF2F4;color:var(--muted);padding:2px 6px;border-radius:4px}
+  .prompt{font-size:14px;line-height:1.6}
+  .prompt p{margin-bottom:8px}
+  .prompt code,.ex code{font-family:'IBM Plex Mono',monospace;font-size:12.5px;background:#EEF3F5;padding:1px 5px;border-radius:4px}
+  .ex{font-family:'IBM Plex Mono',monospace;font-size:12.5px;background:#F5F8F9;border-left:3px solid var(--line);padding:8px 10px;border-radius:0 6px 6px 0;margin:8px 0;line-height:1.6;white-space:pre-wrap}
+
+  textarea.editor{width:100%;min-height:270px;background:var(--editor-bg);color:var(--editor-ink);font-family:'IBM Plex Mono',monospace;font-size:13px;line-height:1.6;padding:12px 14px;border:none;border-radius:8px;resize:vertical;tab-size:4;margin-top:10px}
+  textarea.editor:focus{outline:2px solid var(--charge);outline-offset:2px}
+
+  .actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;align-items:center}
+  button{font-family:'IBM Plex Sans',sans-serif;font-size:13px;font-weight:600;padding:8px 13px;border-radius:7px;border:1px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer}
+  button:hover{border-color:var(--ink)}
+  button:disabled{opacity:.5;cursor:not-allowed}
+  button:focus-visible{outline:2px solid var(--charge);outline-offset:2px}
+  .btn-run{background:var(--charge);border-color:var(--charge);color:#fff}
+  .btn-run:hover{background:#0B7350;border-color:#0B7350}
+  .btn-warn{color:var(--fail)}
+  .spacer{margin-left:auto}
+
+  .results{margin-top:12px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;line-height:1.6}
+  .r-head{font-weight:600;padding:8px 10px;border-radius:6px;margin-bottom:6px}
+  .r-pass{background:var(--charge-soft);color:#0B6B48}
+  .r-fail{background:var(--fail-soft);color:#8E2F1C}
+  .case{padding:6px 10px;border-left:3px solid var(--line);margin-bottom:4px;white-space:pre-wrap;word-break:break-word}
+  .case.ok{border-color:var(--charge)}
+  .case.bad{border-color:var(--fail);background:#FDF4F2}
+
+  details{margin-top:12px;border:1px solid var(--line);border-radius:8px;padding:10px 12px;background:#FAFCFC}
+  summary{cursor:pointer;font-weight:600;font-size:13.5px}
+  details .body{margin-top:10px;font-size:13.5px;line-height:1.6}
+  details pre{background:var(--editor-bg);color:var(--editor-ink);font-family:'IBM Plex Mono',monospace;font-size:12.5px;line-height:1.55;padding:12px;border-radius:7px;overflow-x:auto;margin:8px 0}
+  .cx{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--muted);margin-top:6px}
+  .status{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--muted);margin-top:8px;min-height:15px}
+
+  /* form */
+  .form label{display:block;font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:12px 0 4px;font-weight:500}
+  .form input[type=text], .form select, .form textarea{width:100%;font-family:'IBM Plex Sans',sans-serif;font-size:13.5px;padding:8px 10px;border:1px solid var(--line);border-radius:7px;background:#fff;color:var(--ink)}
+  .form textarea{font-family:'IBM Plex Mono',monospace;font-size:12.5px;line-height:1.55;resize:vertical}
+  .form input:focus,.form select:focus,.form textarea:focus{outline:2px solid var(--charge);outline-offset:1px}
+  .hintline{font-size:12px;color:var(--muted);margin-top:3px;line-height:1.5}
+  .frow{display:flex;gap:10px;flex-wrap:wrap}
+  .frow > div{flex:1;min-width:130px}
+  .testrow{display:flex;gap:8px;align-items:flex-start;margin-bottom:8px}
+  .testrow textarea{flex:2;min-height:60px}
+  .testrow input{flex:1;font-family:'IBM Plex Mono',monospace !important;font-size:12.5px !important}
+  .testrow button{flex-shrink:0;padding:8px 10px}
+  .warnbox{background:var(--warn-soft);border-left:3px solid var(--warn);border-radius:0 7px 7px 0;padding:10px 12px;font-size:13px;line-height:1.55;margin-top:10px}
+
+  /* tracer */
+  .tracer{border:1px solid var(--line);border-radius:9px;margin-top:12px;overflow:hidden}
+  .tracer-head{background:#F5F8F9;padding:9px 12px;font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:14px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .tracer-head .close{margin-left:auto}
+  .tsplit{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:0}
+  @media (max-width:820px){ .tsplit{grid-template-columns:1fr} }
+  .tcode{background:var(--editor-bg);padding:10px 0;overflow:auto;max-height:400px}
+  .tline{display:flex;gap:9px;padding:1px 12px;font-family:'IBM Plex Mono',monospace;font-size:12px;line-height:1.7;white-space:pre;color:#7F97A4;border-left:3px solid transparent}
+  .tline.ran{color:var(--editor-ink)}
+  .tline.active{background:rgba(224,161,0,.22);border-left-color:var(--warn);color:#fff}
+  .tline .ln{color:#4E6675;min-width:20px;text-align:right;user-select:none}
+  .tside{padding:12px;background:#F7FAFB;overflow:auto;max-height:400px}
+  .tvar{margin-bottom:10px}
+  .tvname{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--cool);margin-bottom:3px}
+  .tvname .ty{color:var(--muted);font-size:9.5px;letter-spacing:.06em;text-transform:uppercase;margin-left:5px}
+  .tscalar{font-family:'IBM Plex Mono',monospace;font-size:12.5px;background:#fff;border:1px solid var(--line);border-radius:5px;padding:4px 8px;display:inline-block}
+  .tscalar.chg{background:var(--warn-soft);border-color:var(--warn)}
+  .tcells{display:flex;gap:4px;flex-wrap:wrap}
+  .tcell{min-width:34px;height:32px;padding:0 6px;display:flex;align-items:center;justify-content:center;border:2px solid var(--line);border-radius:6px;background:#fff;font-family:'IBM Plex Mono',monospace;font-size:11.5px}
+  .tcell.chg{background:var(--warn-soft);border-color:var(--warn)}
+  .tcw{display:flex;flex-direction:column;align-items:center;gap:2px}
+  .tix{font-family:'IBM Plex Mono',monospace;font-size:9px;color:var(--muted)}
+  .tkv{font-family:'IBM Plex Mono',monospace;font-size:11.5px;background:#fff;border:1px solid var(--line);border-radius:5px;padding:3px 8px;margin-bottom:3px}
+  .tkv.chg{background:var(--warn-soft);border-color:var(--warn)}
+  .tempty{font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:#B4BEC4}
+  .tctrl{display:flex;gap:7px;align-items:center;padding:9px 12px;background:#F5F8F9;border-top:1px solid var(--line);flex-wrap:wrap}
+  .tpos{font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:var(--muted);margin-left:auto}
+  .tnarr{padding:10px 12px;font-size:13.5px;line-height:1.6;background:#fff;border-top:1px solid var(--line);min-height:44px}
+  .tnarr code{font-family:'IBM Plex Mono',monospace;font-size:12px;background:#EEF3F5;padding:1px 5px;border-radius:4px}
+  .tnarr b{color:var(--charge)}
+</style>
+
+<div class="wrap">
+  <div class="eyebrow">GM Energy Prep &middot; Practice Lab</div>
+  <h1>Coding Practice Lab</h1>
+  <div class="sub">Real Python, real test cases. Edit any problem, add your own, and everything saves automatically.</div>
+
+  <div class="statusbar">
+    <span class="solvedcount"><b id="solvedN">0</b> / <span id="totalN">0</span> solved</span>
+    <button id="addBtn">+ New problem</button>
+    <button id="exportBtn">Export</button>
+    <button id="importBtn">Import</button>
+    <button id="startTimer">Start 45-min timer</button>
+    <button class="btn-warn" id="resetProgress">Reset all</button>
+    <span class="timer" id="timer">45:00</span>
+  </div>
+
+  <div class="layout">
+    <aside class="list" id="list"></aside>
+    <main class="panel" id="panel"></main>
+  </div>
+</div>
+
+<script>
+/* ================= DEFAULT PROBLEMS ================= */
+const DEFAULTS = [
+{id:"two-sum",name:"Two Sum",diff:"Easy",group:"Hash Maps & Arrays",tags:["hash map"],
+ prompt:`<p>Given an array of integers <code>nums</code> and an integer <code>target</code>, return the indices of the two numbers that add up to <code>target</code>. Exactly one answer exists; return indices in ascending order.</p>`,
+ ex:`two_sum([2,7,11,15], 9)  ->  [0,1]`,
+ starter:`def two_sum(nums, target):\n    # your code here\n    pass`,
+ tests:[{code:`_result = two_sum([2,7,11,15], 9)`,expected:`[0, 1]`},{code:`_result = two_sum([3,2,4], 6)`,expected:`[1, 2]`},{code:`_result = two_sum([3,3], 6)`,expected:`[0, 1]`},{code:`_result = two_sum([-1,-2,-3,-4,-5], -8)`,expected:`[2, 4]`}],
+ hint:"Brute force is two nested loops, O(n²). For O(n): as you walk the array once, what would you need stored to know instantly whether the complement (target - num) appeared earlier?",
+ solution:`def two_sum(nums, target):
+    seen = {}                      # value -> index
+    for i, num in enumerate(nums):
+        complement = target - num
+        if complement in seen:
+            return [seen[complement], i]
+        seen[num] = i
+    return []`,
+ explain:"One pass, storing each value's index as you go. Dict lookup is O(1), so the whole scan is O(n). Say the brute force out loud first, then present this as the optimization — interviewers want the trade-off reasoning.",cx:"Time O(n) · Space O(n)"},
+
+{id:"group-anagrams",name:"Group Anagrams",diff:"Medium",group:"Hash Maps & Arrays",tags:["hash map","sorting"],
+ prompt:`<p>Group the anagrams together. Return groups sorted by their first element, with each group's words in original relative order.</p>`,
+ ex:`group_anagrams(["eat","tea","tan","ate","nat","bat"])\n  ->  [['bat'], ['eat', 'tea', 'ate'], ['tan', 'nat']]`,
+ starter:`def group_anagrams(strs):\n    # your code here\n    pass`,
+ tests:[{code:`_result = group_anagrams(["eat","tea","tan","ate","nat","bat"])`,expected:`[['bat'], ['eat', 'tea', 'ate'], ['tan', 'nat']]`},{code:`_result = group_anagrams([""])`,expected:`[['']]`},{code:`_result = group_anagrams(["abc","cba","xyz"])`,expected:`[['abc', 'cba'], ['xyz']]`}],
+ hint:"Two words are anagrams if they share a canonical form. Sorted letters work ('eat' and 'tea' both become 'aet'). A character-count tuple also works and avoids the sort.",
+ solution:`from collections import defaultdict
+
+def group_anagrams(strs):
+    groups = defaultdict(list)
+    for word in strs:
+        key = tuple(sorted(word))       # canonical form
+        groups[key].append(word)
+    return sorted(groups.values())`,
+ explain:"Bucket each word under a canonical key. Sorting each word is O(k log k), total O(n·k log k). The counting-tuple variant drops it to O(n·k) — mention it as a follow-up.",cx:"Time O(n·k log k) · Space O(n·k)"},
+
+{id:"top-k-frequent",name:"Top K Frequent Elements",diff:"Medium",group:"Hash Maps & Arrays",tags:["heap","counting"],
+ prompt:`<p>Return the <code>k</code> most frequent elements, ordered most frequent first.</p>`,
+ ex:`top_k_frequent([1,1,1,2,2,3], 2)  ->  [1, 2]`,
+ starter:`def top_k_frequent(nums, k):\n    # your code here\n    pass`,
+ tests:[{code:`_result = top_k_frequent([1,1,1,2,2,3], 2)`,expected:`[1, 2]`},{code:`_result = top_k_frequent([1], 1)`,expected:`[1]`},{code:`_result = top_k_frequent([4,4,4,5,5,6,6,6,6], 3)`,expected:`[6, 4, 5]`}],
+ hint:"Counting is easy. For selecting top k: full sort is O(n log n), heap of size k is O(n log k), bucket sort by frequency is O(n). Know all three.",
+ solution:`from collections import Counter
+import heapq
+
+def top_k_frequent(nums, k):
+    counts = Counter(nums)
+    return [v for v, _ in heapq.nlargest(k, counts.items(), key=lambda kv: kv[1])]`,
+ explain:"Counter gives frequencies in O(n); the heap is O(n log k), beating a sort when k is small. Bucket sort hits O(n) since frequency can never exceed n — that observation is the senior-level answer.",cx:"Time O(n log k) · Space O(n)"},
+
+{id:"product-except-self",name:"Product of Array Except Self",diff:"Medium",group:"Hash Maps & Arrays",tags:["prefix"],
+ prompt:`<p>Return an array where each element is the product of every other element. No division, O(n) time.</p>`,
+ ex:`product_except_self([1,2,3,4])  ->  [24, 12, 8, 6]`,
+ starter:`def product_except_self(nums):\n    # your code here\n    pass`,
+ tests:[{code:`_result = product_except_self([1,2,3,4])`,expected:`[24, 12, 8, 6]`},{code:`_result = product_except_self([-1,1,0,-3,3])`,expected:`[0, 0, 9, 0, 0]`},{code:`_result = product_except_self([2,3])`,expected:`[3, 2]`}],
+ hint:"The answer at index i is (product of everything left) × (product of everything right). Can you compute both with two sweeps?",
+ solution:`def product_except_self(nums):
+    n = len(nums)
+    result = [1] * n
+    prefix = 1
+    for i in range(n):
+        result[i] = prefix
+        prefix *= nums[i]
+    suffix = 1
+    for i in range(n - 1, -1, -1):
+        result[i] *= suffix
+        suffix *= nums[i]
+    return result`,
+ explain:"Two sweeps: left-to-right for prefix products, right-to-left for suffix. Output doesn't count as extra space by convention, so O(1) auxiliary. Zero-handling falls out naturally — that's why it beats the division trick.",cx:"Time O(n) · Space O(1) auxiliary"},
+
+{id:"longest-consecutive",name:"Longest Consecutive Sequence",diff:"Medium",group:"Hash Maps & Arrays",tags:["set"],
+ prompt:`<p>Return the length of the longest run of consecutive integers. Aim for O(n).</p>`,
+ ex:`longest_consecutive([100,4,200,1,3,2])  ->  4`,
+ starter:`def longest_consecutive(nums):\n    # your code here\n    pass`,
+ tests:[{code:`_result = longest_consecutive([100,4,200,1,3,2])`,expected:`4`},{code:`_result = longest_consecutive([0,3,7,2,5,8,4,6,0,1])`,expected:`9`},{code:`_result = longest_consecutive([])`,expected:`0`},{code:`_result = longest_consecutive([1,1,1])`,expected:`1`}],
+ hint:"Sorting gives O(n log n) — they'll push for better. Put everything in a set, then only start counting a run from a number that has no predecessor.",
+ solution:`def longest_consecutive(nums):
+    num_set = set(nums)
+    best = 0
+    for num in num_set:
+        if num - 1 in num_set:
+            continue                 # not the start of a run
+        length = 1
+        while num + length in num_set:
+            length += 1
+        best = max(best, length)
+    return best`,
+ explain:"The 'skip if predecessor exists' guard is what makes this O(n): each run is walked once from its true start. Without it you'd re-walk from every member. Call out that guard explicitly.",cx:"Time O(n) · Space O(n)"},
+
+{id:"longest-substring",name:"Longest Substring Without Repeating Characters",diff:"Medium",group:"Two Pointers & Sliding Window",tags:["sliding window"],
+ prompt:`<p>Return the length of the longest substring with no repeated characters.</p>`,
+ ex:`length_of_longest_substring("abcabcbb")  ->  3`,
+ starter:`def length_of_longest_substring(s):\n    # your code here\n    pass`,
+ tests:[{code:`_result = length_of_longest_substring("abcabcbb")`,expected:`3`},{code:`_result = length_of_longest_substring("bbbbb")`,expected:`1`},{code:`_result = length_of_longest_substring("pwwkew")`,expected:`3`},{code:`_result = length_of_longest_substring("")`,expected:`0`},{code:`_result = length_of_longest_substring("dvdf")`,expected:`3`}],
+ hint:"Sliding window with two pointers. When the right pointer hits a character already in the window, jump left past that character's last occurrence — don't step one at a time.",
+ solution:`def length_of_longest_substring(s):
+    last_seen = {}
+    left = best = 0
+    for right, ch in enumerate(s):
+        if ch in last_seen and last_seen[ch] >= left:
+            left = last_seen[ch] + 1     # jump past duplicate
+        last_seen[ch] = right
+        best = max(best, right - left + 1)
+    return best`,
+ explain:"The guard `last_seen[ch] >= left` matters: a stale index from before the window must not drag left backward. The 'dvdf' case catches exactly that bug.",cx:"Time O(n) · Space O(min(n, charset))"},
+
+{id:"container-water",name:"Container With Most Water",diff:"Medium",group:"Two Pointers & Sliding Window",tags:["two pointers"],
+ prompt:`<p>Find two lines that with the x-axis hold the most water. Return the max area.</p>`,
+ ex:`max_area([1,8,6,2,5,4,8,3,7])  ->  49`,
+ starter:`def max_area(heights):\n    # your code here\n    pass`,
+ tests:[{code:`_result = max_area([1,8,6,2,5,4,8,3,7])`,expected:`49`},{code:`_result = max_area([1,1])`,expected:`1`},{code:`_result = max_area([4,3,2,1,4])`,expected:`16`},{code:`_result = max_area([1,2,1])`,expected:`2`}],
+ hint:"Start at both ends — the widest container. Moving the taller pointer can never help since area is capped by the shorter line. So which moves?",
+ solution:`def max_area(heights):
+    left, right = 0, len(heights) - 1
+    best = 0
+    while left < right:
+        height = min(heights[left], heights[right])
+        best = max(best, height * (right - left))
+        if heights[left] < heights[right]:
+            left += 1
+        else:
+            right -= 1
+    return best`,
+ explain:"Say the justification out loud: width always shrinks, so the only gain is a taller limiting line — and the limit is the shorter one. That argument is why the greedy move is correct.",cx:"Time O(n) · Space O(1)"},
+
+{id:"merge-intervals",name:"Merge Intervals",diff:"Medium",group:"Intervals",tags:["sorting","intervals"],
+ prompt:`<p>Merge all overlapping intervals, returning the result sorted by start time.</p>`,
+ ex:`merge([[1,3],[2,6],[8,10],[15,18]])  ->  [[1, 6], [8, 10], [15, 18]]`,
+ starter:`def merge(intervals):\n    # your code here\n    pass`,
+ tests:[{code:`_result = merge([[1,3],[2,6],[8,10],[15,18]])`,expected:`[[1, 6], [8, 10], [15, 18]]`},{code:`_result = merge([[1,4],[4,5]])`,expected:`[[1, 5]]`},{code:`_result = merge([])`,expected:`[]`},{code:`_result = merge([[1,4],[2,3]])`,expected:`[[1, 4]]`}],
+ hint:"Sort by start time. Then walk: either the interval overlaps the last merged one (extend it) or it doesn't (append). Watch the nested case [[1,4],[2,3]].",
+ solution:`def merge(intervals):
+    if not intervals:
+        return []
+    intervals.sort(key=lambda x: x[0])
+    merged = [intervals[0][:]]
+    for start, end in intervals[1:]:
+        if start <= merged[-1][1]:
+            merged[-1][1] = max(merged[-1][1], end)
+        else:
+            merged.append([start, end])
+    return merged`,
+ explain:"The max() is essential — without it a nested interval like [2,3] inside [1,4] would wrongly shrink the end. This pattern shows up constantly in scheduling and telemetry-windowing.",cx:"Time O(n log n) · Space O(n)"},
+
+{id:"insert-interval",name:"Insert Interval",diff:"Medium",group:"Intervals",tags:["intervals"],
+ prompt:`<p>Given sorted non-overlapping intervals, insert a new interval and merge where necessary.</p>`,
+ ex:`insert([[1,3],[6,9]], [2,5])  ->  [[1, 5], [6, 9]]`,
+ starter:`def insert(intervals, new_interval):\n    # your code here\n    pass`,
+ tests:[{code:`_result = insert([[1,3],[6,9]], [2,5])`,expected:`[[1, 5], [6, 9]]`},{code:`_result = insert([[1,2],[3,5],[6,7],[8,10],[12,16]], [4,8])`,expected:`[[1, 2], [3, 10], [12, 16]]`},{code:`_result = insert([], [5,7])`,expected:`[[5, 7]]`},{code:`_result = insert([[1,5]], [6,8])`,expected:`[[1, 5], [6, 8]]`}],
+ hint:"Three phases: intervals before, intervals overlapping (absorb them), intervals after. Input is already sorted, so this is O(n) — don't re-sort.",
+ solution:`def insert(intervals, new_interval):
+    result = []
+    start, end = new_interval
+    i, n = 0, len(intervals)
+    while i < n and intervals[i][1] < start:
+        result.append(intervals[i]); i += 1
+    while i < n and intervals[i][0] <= end:
+        start = min(start, intervals[i][0])
+        end = max(end, intervals[i][1]); i += 1
+    result.append([start, end])
+    while i < n:
+        result.append(intervals[i]); i += 1
+    return result`,
+ explain:"Three explicit phases keep the logic clean and easy to explain on a whiteboard. Since input is pre-sorted you get O(n) — point that out, candidates often re-sort out of habit.",cx:"Time O(n) · Space O(n)"},
+
+{id:"meeting-rooms",name:"Meeting Rooms II",diff:"Medium",group:"Intervals",tags:["heap","intervals"],
+ prompt:`<p>Return the minimum number of conference rooms required.</p>`,
+ ex:`min_meeting_rooms([[0,30],[5,10],[15,20]])  ->  2`,
+ starter:`def min_meeting_rooms(intervals):\n    # your code here\n    pass`,
+ tests:[{code:`_result = min_meeting_rooms([[0,30],[5,10],[15,20]])`,expected:`2`},{code:`_result = min_meeting_rooms([[7,10],[2,4]])`,expected:`1`},{code:`_result = min_meeting_rooms([])`,expected:`0`},{code:`_result = min_meeting_rooms([[1,5],[2,6],[3,7],[4,8]])`,expected:`4`},{code:`_result = min_meeting_rooms([[1,2],[2,3],[3,4]])`,expected:`1`}],
+ hint:"Sort by start, keep a min-heap of end times. The root is the room freeing soonest — if the next meeting starts at or after it, reuse. Heap size is the answer.",
+ solution:`import heapq
+
+def min_meeting_rooms(intervals):
+    if not intervals:
+        return 0
+    intervals.sort(key=lambda x: x[0])
+    end_times = []
+    for start, end in intervals:
+        if end_times and end_times[0] <= start:
+            heapq.heapreplace(end_times, end)
+        else:
+            heapq.heappush(end_times, end)
+    return len(end_times)`,
+ explain:"Classic resource-allocation pattern — maps onto connection limits, worker pools, rate limiting. The <= matters: a meeting ending exactly when the next starts frees the room. Expect that boundary probe.",cx:"Time O(n log n) · Space O(n)"},
+
+{id:"valid-parens",name:"Valid Parentheses",diff:"Easy",group:"Stacks & Queues",tags:["stack"],
+ prompt:`<p>Given a string of <code>()[]{}</code>, determine whether brackets are balanced and properly nested.</p>`,
+ ex:`is_valid("()[]{}")  ->  True`,
+ starter:`def is_valid(s):\n    # your code here\n    pass`,
+ tests:[{code:`_result = is_valid("()")`,expected:`True`},{code:`_result = is_valid("()[]{}")`,expected:`True`},{code:`_result = is_valid("(]")`,expected:`False`},{code:`_result = is_valid("([)]")`,expected:`False`},{code:`_result = is_valid("{[]}")`,expected:`True`},{code:`_result = is_valid("(")`,expected:`False`},{code:`_result = is_valid("")`,expected:`True`}],
+ hint:"Push openers onto a stack. On a closer, the top must be its match. Two failure modes at the end: leftover openers, and a closer on an empty stack.",
+ solution:`def is_valid(s):
+    pairs = {')': '(', ']': '[', '}': '{'}
+    stack = []
+    for ch in s:
+        if ch in pairs:
+            if not stack or stack.pop() != pairs[ch]:
+                return False
+        else:
+            stack.append(ch)
+    return not stack`,
+ explain:"Easy, but often the warm-up before something harder — execute cleanly and fast. The missed edge cases are the empty-stack pop and the trailing unclosed opener.",cx:"Time O(n) · Space O(n)"},
+
+{id:"daily-temps",name:"Daily Temperatures",diff:"Medium",group:"Stacks & Queues",tags:["monotonic stack"],
+ prompt:`<p>Return how many days you'd wait for a warmer temperature. Use <code>0</code> where none exists.</p>`,
+ ex:`daily_temperatures([73,74,75,71,69,72,76,73])\n  ->  [1, 1, 4, 2, 1, 1, 0, 0]`,
+ starter:`def daily_temperatures(temps):\n    # your code here\n    pass`,
+ tests:[{code:`_result = daily_temperatures([73,74,75,71,69,72,76,73])`,expected:`[1, 1, 4, 2, 1, 1, 0, 0]`},{code:`_result = daily_temperatures([30,40,50,60])`,expected:`[1, 1, 1, 0]`},{code:`_result = daily_temperatures([50,50,50])`,expected:`[0, 0, 0]`}],
+ hint:"Keep a stack of indices whose answer is unknown, temperatures decreasing. A warmer day resolves everything colder on top.",
+ solution:`def daily_temperatures(temps):
+    result = [0] * len(temps)
+    stack = []                       # indices, temps decreasing
+    for i, temp in enumerate(temps):
+        while stack and temps[stack[-1]] < temp:
+            prev = stack.pop()
+            result[prev] = i - prev
+        stack.append(i)
+    return result`,
+ explain:"The monotonic stack pattern — recognize it for 'next greater/smaller element'. Each index is pushed and popped once, so despite the nested while it's O(n). State that amortized argument explicitly.",cx:"Time O(n) · Space O(n)"},
+
+{id:"num-islands",name:"Number of Islands",diff:"Medium",group:"Trees & Graphs",tags:["dfs","bfs","grid"],
+ prompt:`<p>Count islands in a grid of <code>'1'</code> (land) and <code>'0'</code> (water), connected horizontally or vertically.</p>`,
+ ex:`num_islands([["1","1","0"],["1","0","0"],["0","0","1"]])  ->  2`,
+ starter:`def num_islands(grid):\n    # your code here\n    pass`,
+ tests:[{code:`_result = num_islands([["1","1","0"],["1","0","0"],["0","0","1"]])`,expected:`2`},{code:`_result = num_islands([["1","1","1"],["1","1","1"]])`,expected:`1`},{code:`_result = num_islands([["0","0"],["0","0"]])`,expected:`0`},{code:`_result = num_islands([])`,expected:`0`},{code:`_result = num_islands([["1","0","1","0","1"]])`,expected:`3`}],
+ hint:"Scan every cell. Unvisited land = a new island; then flood-fill (BFS/DFS) to mark its whole region so it isn't counted twice.",
+ solution:`from collections import deque
+
+def num_islands(grid):
+    if not grid or not grid[0]:
+        return 0
+    rows, cols = len(grid), len(grid[0])
+    count = 0
+    for r in range(rows):
+        for c in range(cols):
+            if grid[r][c] != '1':
+                continue
+            count += 1
+            queue = deque([(r, c)])
+            grid[r][c] = '0'
+            while queue:
+                cr, cc = queue.popleft()
+                for dr, dc in ((1,0),(-1,0),(0,1),(0,-1)):
+                    nr, nc = cr + dr, cc + dc
+                    if 0 <= nr < rows and 0 <= nc < cols and grid[nr][nc] == '1':
+                        grid[nr][nc] = '0'
+                        queue.append((nr, nc))
+    return count`,
+ explain:"BFS over DFS is a deliberate choice worth voicing: recursive DFS can blow the stack on a large all-land grid. Mark cells when you enqueue, not when you dequeue, or the same cell enters twice.",cx:"Time O(rows·cols) · Space O(rows·cols)"},
+
+{id:"course-schedule",name:"Course Schedule",diff:"Medium",group:"Trees & Graphs",tags:["topological sort","graph"],
+ prompt:`<p>Prerequisites are pairs <code>[a, b]</code> meaning b before a. Return whether all courses can be finished.</p>`,
+ ex:`can_finish(2, [[1,0]])         ->  True\ncan_finish(2, [[1,0],[0,1]])   ->  False`,
+ starter:`def can_finish(num_courses, prerequisites):\n    # your code here\n    pass`,
+ tests:[{code:`_result = can_finish(2, [[1,0]])`,expected:`True`},{code:`_result = can_finish(2, [[1,0],[0,1]])`,expected:`False`},{code:`_result = can_finish(4, [[1,0],[2,1],[3,2]])`,expected:`True`},{code:`_result = can_finish(3, [[0,1],[1,2],[2,0]])`,expected:`False`},{code:`_result = can_finish(1, [])`,expected:`True`}],
+ hint:"Cycle detection in a directed graph. Kahn's algorithm: repeatedly remove nodes with zero remaining prerequisites. Can't process everything → cycle.",
+ solution:`from collections import deque, defaultdict
+
+def can_finish(num_courses, prerequisites):
+    graph = defaultdict(list)
+    in_degree = [0] * num_courses
+    for course, prereq in prerequisites:
+        graph[prereq].append(course)
+        in_degree[course] += 1
+    queue = deque(c for c in range(num_courses) if in_degree[c] == 0)
+    completed = 0
+    while queue:
+        course = queue.popleft()
+        completed += 1
+        for nxt in graph[course]:
+            in_degree[nxt] -= 1
+            if in_degree[nxt] == 0:
+                queue.append(nxt)
+    return completed == num_courses`,
+ explain:"Kahn's algorithm generalizes far beyond courses — build dependencies, service startup order, pipeline DAGs. Worth connecting to circular microservice dependencies. Returning the actual order is the standard follow-up.",cx:"Time O(V + E) · Space O(V + E)"},
+
+{id:"lru-cache",name:"LRU Cache",diff:"Medium",group:"Design",tags:["design","hash map","linked list"],
+ prompt:`<p>Fixed-capacity cache with O(1) <code>get</code> and <code>put</code>, evicting the least recently used entry. <code>get</code> returns <code>-1</code> if missing.</p><p><b>Practice until you can write it cold in 15 minutes.</b> The most common senior-level coding question.</p>`,
+ ex:`c = LRUCache(2)\nc.put(1,1); c.put(2,2)\nc.get(1)    ->  1\nc.put(3,3)              # evicts key 2`,
+ starter:`class LRUCache:\n    def __init__(self, capacity):\n        pass\n\n    def get(self, key):\n        pass\n\n    def put(self, key, value):\n        pass`,
+ tests:[{code:`c = LRUCache(2)\nc.put(1,1); c.put(2,2)\nr = [c.get(1)]\nc.put(3,3)\nr.append(c.get(2))\nc.put(4,4)\nr.append(c.get(1)); r.append(c.get(3)); r.append(c.get(4))\n_result = r`,expected:`[1, -1, -1, 3, 4]`},{code:`c = LRUCache(1)\nc.put(1,1)\nc.put(2,2)\n_result = [c.get(1), c.get(2)]`,expected:`[-1, 2]`},{code:`c = LRUCache(2)\nc.put(1,1)\nc.put(1,10)\n_result = [c.get(1)]`,expected:`[10]`},{code:`c = LRUCache(2)\n_result = [c.get(99)]`,expected:`[-1]`}],
+ hint:"You need O(1) lookup AND O(1) reordering. A dict gives the first; a doubly linked list the second. Store the node itself as the dict value. OrderedDict does both — but be ready to hand-roll.",
+ solution:`from collections import OrderedDict
+
+class LRUCache:
+    def __init__(self, capacity):
+        self.capacity = capacity
+        self.cache = OrderedDict()
+
+    def get(self, key):
+        if key not in self.cache:
+            return -1
+        self.cache.move_to_end(key)
+        return self.cache[key]
+
+    def put(self, key, value):
+        if key in self.cache:
+            self.cache.move_to_end(key)
+        self.cache[key] = value
+        if len(self.cache) > self.capacity:
+            self.cache.popitem(last=False)
+
+
+# Hand-rolled version — practice THIS one.
+class Node:
+    def __init__(self, key=0, val=0):
+        self.key, self.val = key, val
+        self.prev = self.next = None
+
+class LRUCacheManual:
+    def __init__(self, capacity):
+        self.capacity = capacity
+        self.map = {}
+        self.head, self.tail = Node(), Node()
+        self.head.next, self.tail.prev = self.tail, self.head
+
+    def _remove(self, node):
+        node.prev.next, node.next.prev = node.next, node.prev
+
+    def _add_front(self, node):
+        node.next, node.prev = self.head.next, self.head
+        self.head.next.prev = node
+        self.head.next = node
+
+    def get(self, key):
+        if key not in self.map: return -1
+        node = self.map[key]
+        self._remove(node); self._add_front(node)
+        return node.val
+
+    def put(self, key, value):
+        if key in self.map: self._remove(self.map[key])
+        node = Node(key, value)
+        self.map[key] = node
+        self._add_front(node)
+        if len(self.map) > self.capacity:
+            lru = self.tail.prev
+            self._remove(lru)
+            del self.map[lru.key]        # don't forget this!`,
+ explain:"Two things sink candidates: forgetting to delete the evicted key from the dict (leaks memory, corrupts lookups), and fumbling pointer updates — sentinel head/tail nodes remove all null checks. Ask whether the standard library is allowed. Bridge to system design: the distributed version is Redis with LRU eviction, plus TTLs and stampede protection.",cx:"Time O(1) per operation · Space O(capacity)"},
+
+{id:"time-map",name:"Time-Based Key-Value Store",diff:"Medium",group:"Design",tags:["design","binary search"],
+ prompt:`<p><code>set(key, value, timestamp)</code> stores a value; <code>get(key, timestamp)</code> returns the value with the largest stored timestamp <code>&lt;= timestamp</code>, or <code>""</code>. Timestamps per key are strictly increasing.</p><p><b>Highly relevant to this role</b> — a miniature telemetry store.</p>`,
+ ex:`s = TimeMap()\ns.set("foo","bar",1)\ns.get("foo",3)  ->  "bar"`,
+ starter:`class TimeMap:\n    def __init__(self):\n        pass\n\n    def set(self, key, value, timestamp):\n        pass\n\n    def get(self, key, timestamp):\n        pass`,
+ tests:[{code:`s = TimeMap()\ns.set("foo","bar",1)\nr = [s.get("foo",1), s.get("foo",3)]\ns.set("foo","bar2",4)\nr += [s.get("foo",4), s.get("foo",5)]\n_result = r`,expected:`['bar', 'bar', 'bar2', 'bar2']`},{code:`s = TimeMap()\ns.set("a","x",10)\n_result = [s.get("a",5), s.get("a",10), s.get("b",10)]`,expected:`['', 'x', '']`},{code:`s = TimeMap()\nfor i in range(1, 6):\n    s.set("k", "v" + str(i), i * 10)\n_result = [s.get("k",25), s.get("k",50), s.get("k",100)]`,expected:`['v2', 'v5', 'v5']`}],
+ hint:"Timestamps arrive increasing, so each key's list is already sorted — binary search it. You want the rightmost entry with timestamp <= target.",
+ solution:`from collections import defaultdict
+import bisect
+
+class TimeMap:
+    def __init__(self):
+        self.store = defaultdict(list)       # key -> [(timestamp, value)]
+
+    def set(self, key, value, timestamp):
+        self.store[key].append((timestamp, value))
+
+    def get(self, key, timestamp):
+        entries = self.store.get(key)
+        if not entries:
+            return ""
+        i = bisect.bisect_right(entries, (timestamp, chr(0x10FFFF)))
+        return entries[i - 1][1] if i else ""`,
+ explain:"set is O(1) since input is ordered; get is O(log n). If tuple-comparison tricks feel risky under pressure, keep parallel lists of timestamps and values and bisect the timestamps directly. This is exactly how you'd answer 'what was this vehicle's state of charge at 3pm'.",cx:"set O(1) · get O(log n) · Space O(n)"},
+
+{id:"rate-limiter",name:"Token Bucket Rate Limiter",diff:"Medium",group:"Design",tags:["design","backend"],
+ prompt:`<p>Bucket holds <code>capacity</code> tokens, refills at <code>refill_rate</code>/second. <code>allow(timestamp)</code> spends one token and returns <code>True</code>, or <code>False</code> if empty. Timestamps are non-decreasing floats.</p><p><b>Directly job-relevant</b> — every API gateway needs one.</p>`,
+ ex:`rl = RateLimiter(capacity=2, refill_rate=1)\nrl.allow(0) -> True\nrl.allow(0) -> True\nrl.allow(0) -> False`,
+ starter:`class RateLimiter:\n    def __init__(self, capacity, refill_rate):\n        pass\n\n    def allow(self, timestamp):\n        pass`,
+ tests:[{code:`rl = RateLimiter(2, 1)\n_result = [rl.allow(0), rl.allow(0), rl.allow(0), rl.allow(1), rl.allow(1)]`,expected:`[True, True, False, True, False]`},{code:`rl = RateLimiter(3, 2)\n_result = [rl.allow(0), rl.allow(0), rl.allow(0), rl.allow(0), rl.allow(1.5)]`,expected:`[True, True, True, False, True]`},{code:`rl = RateLimiter(1, 1)\n_result = [rl.allow(0), rl.allow(100), rl.allow(100)]`,expected:`[True, True, False]`}],
+ hint:"Don't run a background refill timer. Compute lazily: on each call add (elapsed × refill_rate) tokens, capped at capacity, then try to spend one.",
+ solution:`class RateLimiter:
+    def __init__(self, capacity, refill_rate):
+        self.capacity = capacity
+        self.refill_rate = refill_rate
+        self.tokens = float(capacity)
+        self.last_ts = 0.0
+
+    def allow(self, timestamp):
+        elapsed = timestamp - self.last_ts
+        if elapsed > 0:
+            self.tokens = min(self.capacity, self.tokens + elapsed * self.refill_rate)
+            self.last_ts = timestamp
+        if self.tokens >= 1:
+            self.tokens -= 1
+            return True
+        return False`,
+ explain:"Lazy refill is the key idea — no timers, constant time and space per client. The cap allows controlled bursts while holding the long-run average. Follow-ups to have ready: distributed version (Redis + atomic Lua script, since read-modify-write races), per-client memory cost, and how this differs from a sliding-window counter.",cx:"Time O(1) · Space O(1) per client"}
+];
+
+/* ================= STATE ================= */
+const KEY = "gm-practice-lab-v2";
+/* localStorage-backed storage (drop-in replacement for the preview sandbox API) */
+const storage = {
+  async set(k, v){
+    try{ localStorage.setItem(k, v); return true; }
+    catch(e){ return false; }
+  },
+  async get(k){
+    try{ const v = localStorage.getItem(k); return v === null ? null : { value: v }; }
+    catch(e){ return null; }
+  }
+};
+let state = { code:{}, solved:{}, overrides:{}, custom:[], deleted:[] };
+let current = null, editing = false, pyodide = null, pyLoading = false;
+
+function problems(){
+  const base = DEFAULTS.filter(p => !state.deleted.includes(p.id))
+    .map(p => state.overrides[p.id] ? Object.assign({}, p, state.overrides[p.id]) : p);
+  return base.concat(state.custom.filter(p => !state.deleted.includes(p.id)));
+}
+function byId(id){ return problems().find(p => p.id === id); }
+function isCustom(id){ return state.custom.some(p => p.id === id); }
+function isEdited(id){ return !!state.overrides[id]; }
+
+async function save(){
+  try{
+    const r = await storage.set(KEY, JSON.stringify(state));
+    setStatus(r ? "Saved \u2713" : "Save failed — changes may not persist.");
+  }catch(e){ setStatus("Save failed — changes may not persist."); }
+}
+async function load(){
+  try{
+    const r = await storage.get(KEY);
+    if(r && r.value) state = Object.assign(state, JSON.parse(r.value));
+  }catch(e){}
+  ["code","solved","overrides"].forEach(k => { if(!state[k]) state[k] = {}; });
+  ["custom","deleted"].forEach(k => { if(!state[k]) state[k] = []; });
+}
+function setStatus(m){ const el=document.getElementById("status"); if(el) el.textContent=m; }
+function esc(s){ return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#39;"); }
+/* Strip everything but a small text-formatting whitelist from user-supplied HTML.
+   Used for the `prompt` field, which intentionally supports <p> <code> <b> etc.
+   All attributes (including event handlers) are removed. */
+function sanitizeHtml(html){
+  const ALLOWED={P:1,CODE:1,B:1,BR:1,I:1,EM:1,STRONG:1,UL:1,OL:1,LI:1,DIV:1,SPAN:1};
+  const doc=new DOMParser().parseFromString(String(html),"text/html");
+  function walk(node){
+    if(node.nodeType!==1) return;               // text nodes pass through
+    const tag=node.tagName.toUpperCase();
+    if(!ALLOWED[tag]){                          // unwrap disallowed elements
+      const kids=Array.from(node.childNodes);
+      while(node.firstChild) node.parentNode.insertBefore(node.firstChild,node);
+      node.parentNode.removeChild(node);
+      kids.forEach(walk);
+      return;
+    }
+    Array.from(node.attributes).forEach(a=>node.removeAttribute(a.name));
+    Array.from(node.childNodes).forEach(walk);
+  }
+  Array.from(doc.body.childNodes).forEach(walk);
+  return doc.body.innerHTML;
+}
+
+/* ================= LIST ================= */
+function renderList(){
+  const el=document.getElementById("list"); el.innerHTML="";
+  let lastGroup=null;
+  problems().forEach(p=>{
+    if(p.group!==lastGroup){
+      lastGroup=p.group;
+      const g=document.createElement("div"); g.className="list-group"; g.textContent=p.group; el.appendChild(g);
+    }
+    const item=document.createElement("div");
+    item.className="p-item"+(p.id===current?" active":"");
+    item.innerHTML='<span class="tick">'+(state.solved[p.id]?"\u2713":"")+'</span>'+
+      '<span class="p-name">'+esc(p.name)+'</span>'+
+      (isCustom(p.id)?'<span class="mine">MINE</span>':(isEdited(p.id)?'<span class="mine">EDITED</span>':''))+
+      '<span class="diff d-'+esc(p.diff)+'">'+esc(p.diff).toUpperCase()+'</span>';
+    item.addEventListener("click",()=>{ current=p.id; editing=false; renderList(); renderPanel(); });
+    el.appendChild(item);
+  });
+  const n=Object.keys(state.solved).filter(k=>state.solved[k]).length;
+  document.getElementById("solvedN").textContent=n;
+  document.getElementById("totalN").textContent=problems().length;
+}
+
+/* ================= VIEW PANEL ================= */
+function renderPanel(){
+  const panel=document.getElementById("panel");
+  const p=byId(current);
+  if(!p){ panel.innerHTML='<div class="prompt">No problem selected. Pick one from the list, or create a new one.</div>'; return; }
+  if(editing){ renderForm(p); return; }
+  const saved = state.code[p.id]!==undefined ? state.code[p.id] : p.starter;
+  panel.innerHTML=
+    '<div class="p-title">'+esc(p.name)+'</div>'+
+    '<div class="p-meta"><span class="diff d-'+esc(p.diff)+'">'+esc(p.diff).toUpperCase()+'</span>'+
+      (p.tags||[]).map(t=>'<span class="p-tag">'+esc(t)+'</span>').join("")+
+      (state.solved[p.id]?'<span class="p-tag" style="background:var(--charge-soft);color:#0B6B48">SOLVED \u2713</span>':'')+
+    '</div>'+
+    '<div class="prompt">'+sanitizeHtml(p.prompt)+'</div>'+
+    '<div class="ex">'+esc(p.ex)+'</div>'+
+    '<textarea class="editor" id="editor" spellcheck="false"></textarea>'+
+    '<div class="actions">'+
+      '<button class="btn-run" id="runBtn">Run tests</button>'+
+      '<button id="resetCode">Reset code</button>'+
+      '<span class="spacer"></span>'+
+      '<button id="editBtn">Edit problem</button>'+
+    '</div>'+
+    '<div class="status" id="status"></div>'+
+    '<div class="results" id="results"></div>'+
+    '<div class="actions" style="margin-top:12px">'+
+      '<button id="traceMine">\u25B6 Walk through MY code</button>'+
+      (p.solution?'<button id="traceSol">\u25B6 Walk through the SOLUTION</button>':'')+
+    '</div>'+
+    '<div id="tracerBox"></div>'+
+    (p.hint?'<details><summary>Show hint</summary><div class="body">'+esc(p.hint)+'</div></details>':'')+
+    (p.solution?'<details><summary>Show full solution &amp; explanation</summary><div class="body"><pre>'+esc(p.solution)+'</pre>'+
+      esc(p.explain||"")+'<div class="cx">'+esc(p.cx||"")+'</div></div></details>':'');
+
+  const ed=document.getElementById("editor");
+  ed.value=saved;
+  ed.addEventListener("input",()=>{ state.code[p.id]=ed.value; save(); });
+  ed.addEventListener("keydown",e=>{
+    if(e.key==="Tab"){ e.preventDefault();
+      const s=ed.selectionStart,en=ed.selectionEnd;
+      ed.value=ed.value.slice(0,s)+"    "+ed.value.slice(en);
+      ed.selectionStart=ed.selectionEnd=s+4;
+      state.code[p.id]=ed.value; save();
+    }
+  });
+  document.getElementById("runBtn").addEventListener("click",()=>runTests(p));
+  document.getElementById("resetCode").addEventListener("click",()=>{
+    if(!confirm("Reset your code to the starter template?")) return;
+    delete state.code[p.id]; save(); renderPanel();
+  });
+  document.getElementById("editBtn").addEventListener("click",()=>{ editing=true; renderPanel(); });
+  document.getElementById("traceMine").addEventListener("click",()=>startTrace(p, document.getElementById("editor").value, "your code"));
+  const ts=document.getElementById("traceSol");
+  if(ts) ts.addEventListener("click",()=>startTrace(p, p.solution, "the solution"));
+}
+
+/* ================= EDIT FORM ================= */
+function renderForm(p){
+  const isNew = p.__new;
+  const panel=document.getElementById("panel");
+  panel.innerHTML=
+    '<div class="p-title">'+(isNew?"New problem":"Edit: "+esc(p.name))+'</div>'+
+    '<div class="form">'+
+    '<div class="frow">'+
+      '<div><label>Name</label><input type="text" id="f-name" value="'+esc(p.name)+'"></div>'+
+      '<div><label>Difficulty</label><select id="f-diff">'+
+        ["Easy","Medium","Hard"].map(d=>'<option '+(p.diff===d?"selected":"")+'>'+d+'</option>').join("")+
+      '</select></div>'+
+    '</div>'+
+    '<div class="frow">'+
+      '<div><label>Group (section heading)</label><input type="text" id="f-group" value="'+esc(p.group)+'"></div>'+
+      '<div><label>Tags (comma separated)</label><input type="text" id="f-tags" value="'+esc((p.tags||[]).join(", "))+'"></div>'+
+    '</div>'+
+    '<label>Description (HTML allowed: &lt;p&gt; &lt;code&gt; &lt;b&gt;)</label>'+
+    '<textarea id="f-prompt" rows="4">'+esc(p.prompt)+'</textarea>'+
+    '<label>Examples block (plain text)</label>'+
+    '<textarea id="f-ex" rows="3">'+esc(p.ex)+'</textarea>'+
+    '<label>Starter code</label>'+
+    '<textarea id="f-starter" rows="5">'+esc(p.starter)+'</textarea>'+
+
+    '<label>Test cases</label>'+
+    '<div class="hintline">Each test runs your solution then assigns the answer to <code>_result</code>. The expected value is compared against Python\'s <code>repr()</code> — so strings need quotes (<code>\'bar\'</code>), and lists look like <code>[1, 2]</code> with spaces after commas.</div>'+
+    '<div id="f-tests"></div>'+
+    '<button id="addTest" style="margin-top:6px">+ Add test case</button>'+
+
+    '<label>Hint</label><textarea id="f-hint" rows="3">'+esc(p.hint||"")+'</textarea>'+
+    '<label>Solution code</label><textarea id="f-solution" rows="8">'+esc(p.solution||"")+'</textarea>'+
+    '<label>Explanation</label><textarea id="f-explain" rows="4">'+esc(p.explain||"")+'</textarea>'+
+    '<label>Complexity line</label><input type="text" id="f-cx" value="'+esc(p.cx||"")+'">'+
+
+    '<div class="actions" style="margin-top:16px">'+
+      '<button class="btn-run" id="saveBtn">Save problem</button>'+
+      '<button id="cancelBtn">Cancel</button>'+
+      '<span class="spacer"></span>'+
+      (!isNew && isEdited(p.id) ? '<button id="revertBtn">Revert to original</button>' : '')+
+      (!isNew ? '<button class="btn-warn" id="deleteBtn">Delete</button>' : '')+
+    '</div>'+
+    '<div class="status" id="status"></div>'+
+    (!isNew && !isCustom(p.id) ? '<div class="warnbox">Editing a built-in problem stores your version as an override. You can revert to the original at any time.</div>' : '')+
+    '</div>';
+
+  let tests = JSON.parse(JSON.stringify(p.tests || []));
+  function drawTests(){
+    document.getElementById("f-tests").innerHTML = tests.map((t,i)=>
+      '<div class="testrow">'+
+        '<textarea data-i="'+i+'" data-f="code" placeholder="_result = my_func(...)">'+esc(t.code)+'</textarea>'+
+        '<input type="text" data-i="'+i+'" data-f="expected" placeholder="expected repr" value="'+esc(t.expected)+'">'+
+        '<button data-del="'+i+'">\u2715</button>'+
+      '</div>').join("") || '<div class="hintline">No test cases yet.</div>';
+    document.querySelectorAll("#f-tests [data-f]").forEach(el=>{
+      el.addEventListener("input",()=>{ tests[+el.dataset.i][el.dataset.f]=el.value; });
+    });
+    document.querySelectorAll("#f-tests [data-del]").forEach(el=>{
+      el.addEventListener("click",()=>{ tests.splice(+el.dataset.del,1); drawTests(); });
+    });
+  }
+  drawTests();
+  document.getElementById("addTest").addEventListener("click",()=>{ tests.push({code:"_result = ",expected:""}); drawTests(); });
+
+  document.getElementById("cancelBtn").addEventListener("click",()=>{
+    if(isNew) current = problems()[0] ? problems()[0].id : null;
+    editing=false; renderList(); renderPanel();
+  });
+
+  document.getElementById("saveBtn").addEventListener("click",async()=>{
+    const name=document.getElementById("f-name").value.trim();
+    if(!name){ setStatus("Name can't be empty."); return; }
+    const obj={
+      id: p.id,
+      name,
+      diff: document.getElementById("f-diff").value,
+      group: document.getElementById("f-group").value.trim() || "My Problems",
+      tags: document.getElementById("f-tags").value.split(",").map(s=>s.trim()).filter(Boolean),
+      prompt: document.getElementById("f-prompt").value,
+      ex: document.getElementById("f-ex").value,
+      starter: document.getElementById("f-starter").value,
+      tests: tests.filter(t=>t.code.trim()),
+      hint: document.getElementById("f-hint").value,
+      solution: document.getElementById("f-solution").value,
+      explain: document.getElementById("f-explain").value,
+      cx: document.getElementById("f-cx").value
+    };
+    if(isNew || isCustom(p.id)){
+      const i=state.custom.findIndex(c=>c.id===p.id);
+      if(i>=0) state.custom[i]=obj; else state.custom.push(obj);
+    } else {
+      state.overrides[p.id]=obj;
+    }
+    current=obj.id; editing=false;
+    await save(); renderList(); renderPanel();
+  });
+
+  const revert=document.getElementById("revertBtn");
+  if(revert) revert.addEventListener("click",async()=>{
+    if(!confirm("Discard your edits and restore the original problem?")) return;
+    delete state.overrides[p.id]; editing=false;
+    await save(); renderList(); renderPanel();
+  });
+
+  const del=document.getElementById("deleteBtn");
+  if(del) del.addEventListener("click",async()=>{
+    if(!confirm("Delete this problem? Built-in problems can be restored with \"Reset all\".")) return;
+    if(isCustom(p.id)) state.custom=state.custom.filter(c=>c.id!==p.id);
+    else state.deleted.push(p.id);
+    delete state.overrides[p.id]; delete state.code[p.id]; delete state.solved[p.id];
+    editing=false; current = problems()[0] ? problems()[0].id : null;
+    await save(); renderList(); renderPanel();
+  });
+}
+
+/* ================= PYTHON ================= */
+async function ensurePyodide(){
+  if(pyodide) return pyodide;
+  if(pyLoading) throw new Error("loading");
+  if(typeof WebAssembly==="undefined"){ throw new Error("nowasm"); }
+  pyLoading=true;
+  setStatus("Loading Python engine (first run only, ~10s)\u2026");
+  const CDNS=[
+    "https://cdnjs.cloudflare.com/ajax/libs/pyodide/0.26.2/",
+    "https://cdn.jsdelivr.net/pyodide/v0.26.2/full/",
+    "https://unpkg.com/pyodide@0.26.2/",
+    "https://gcore.jsdelivr.net/pyodide/v0.26.2/full/"
+  ];
+  let lastErr=null;
+  for(const base of CDNS){
+    try{
+      if(typeof loadPyodide==="undefined"){
+        await new Promise((res,rej)=>{
+          const s=document.createElement("script");
+          s.src=base+"pyodide.js";
+          s.onload=res; s.onerror=()=>rej(new Error("cdn"));
+          document.head.appendChild(s);
+        });
+      }
+      pyodide=await loadPyodide({indexURL:base});
+      pyLoading=false; setStatus("Python engine ready.");
+      return pyodide;
+    }catch(e){ lastErr=e; }
+  }
+  pyLoading=false;
+  throw new Error("cdn");   // all mirrors failed — see lastErr
+}
+
+const ENGINE_MSG='<div class="warnbox"><b>Python can\u2019t run in this browser.</b> '+
+  'Your browser is blocking WebAssembly, which the in-browser Python engine needs \u2014 so "Run tests" and the walkthroughs are disabled here.<br><br>'+
+  '<b>Fix:</b> open this page in an up-to-date Chrome, Edge, or Firefox. Everything works there \u2014 tests, tracing, all of it.<br><br>'+
+  'Prefer your terminal? Use the companion <code>gm_practice.py</code> runner \u2014 same problems, same tests, plus a line-by-line tracer, running on your local Python.</div>';
+
+const CDN_MSG='<div class="warnbox"><b>Couldn\u2019t load the Python engine.</b> '+
+  'The in-browser Python runtime downloads from a CDN on first use, and all four mirrors failed \u2014 this is usually a temporary network or firewall issue, not a browser problem.<br><br>'+
+  'Check your connection and hit "Run tests" again. Still stuck? Use the companion <code>gm_practice.py</code> terminal runner \u2014 same problems, same tests, no download.</div>';
+
+function engineErrorMsg(e){ return e && e.message==="cdn" ? CDN_MSG : ENGINE_MSG; }
+
+async function runTests(p){
+  const btn=document.getElementById("runBtn"), out=document.getElementById("results");
+  if(!p.tests || !p.tests.length){ out.innerHTML='<div class="r-head r-fail">This problem has no test cases. Use "Edit problem" to add some.</div>'; return; }
+  btn.disabled=true; out.innerHTML="";
+  let py;
+  try{ py=await ensurePyodide(); }
+  catch(e){ btn.disabled=false; setStatus(""); out.innerHTML=engineErrorMsg(e); return; }
+  setStatus("Running\u2026");
+
+  const userCode=document.getElementById("editor").value;
+  const results=[]; let allPass=true;
+  for(const t of p.tests){
+    let res;
+    try{
+      py.globals.set("_user_code",userCode);
+      py.globals.set("_test_code",t.code);
+      res=py.runPython(`
+import io, contextlib, traceback
+_ns = {}
+_out = {"ok": False, "got": "", "err": ""}
+_buf = io.StringIO()
+try:
+    with contextlib.redirect_stdout(_buf):
+        exec(_user_code, _ns)
+        exec(_test_code, _ns)
+    _out["got"] = repr(_ns.get("_result"))
+    _out["ok"] = True
+except Exception:
+    _out["err"] = traceback.format_exc(limit=1).strip().split("\\n")[-1]
+_out["stdout"] = _buf.getvalue()[:400]
+_out
+      `).toJs({dict_converter:Object.fromEntries});
+    }catch(e){ res={ok:false,err:String(e).split("\n").slice(-2).join(" "),got:"",stdout:""}; }
+    const pass=res.ok && res.got===t.expected;
+    if(!pass) allPass=false;
+    results.push({t,res,pass});
+  }
+  const passCount=results.filter(r=>r.pass).length;
+  let html='<div class="r-head '+(allPass?"r-pass":"r-fail")+'">'+
+    (allPass?"\u2713 All tests passed — ":"\u2717 ")+passCount+" / "+results.length+" passing"+
+    (allPass?". Marked as solved.":". See failures below.")+'</div>';
+  results.forEach((r,i)=>{
+    const label="Case "+(i+1)+": "+r.t.code.replace(/\n/g," ; ");
+    if(r.pass) html+='<div class="case ok">\u2713 '+esc(label)+'\n   returned '+esc(r.res.got)+'</div>';
+    else if(r.res.err) html+='<div class="case bad">\u2717 '+esc(label)+'\n   error: '+esc(r.res.err)+'</div>';
+    else html+='<div class="case bad">\u2717 '+esc(label)+'\n   expected '+esc(r.t.expected)+'\n   returned '+esc(r.res.got)+'</div>';
+    if(r.res.stdout) html+='<div class="case">stdout: '+esc(r.res.stdout)+'</div>';
+  });
+  out.innerHTML=html;
+  if(allPass){ state.solved[p.id]=true; save(); renderList(); }
+  setStatus(""); btn.disabled=false;
+}
+
+/* ================= LINE-BY-LINE TRACER ================= */
+let TR = { frames:[], lines:[], step:0, playing:null, label:"" };
+
+async function startTrace(p, code, label){
+  const boxEl=document.getElementById("tracerBox");
+  if(!code || !code.trim()){ boxEl.innerHTML='<div class="warnbox">There is no code to walk through yet.</div>'; return; }
+  if(!p.tests || !p.tests.length){ boxEl.innerHTML='<div class="warnbox">This problem needs at least one test case — the tracer runs your code against it. Add one under "Edit problem".</div>'; return; }
+  boxEl.innerHTML='<div class="warnbox">Running your code step by step\u2026</div>';
+  let py;
+  try{ py=await ensurePyodide(); }
+  catch(e){ boxEl.innerHTML=engineErrorMsg(e); return; }
+
+  const testCode=p.tests[0].code;
+  let data;
+  try{
+    py.globals.set("_trace_code", code);
+    py.globals.set("_trace_test", testCode);
+    const raw=py.runPython(`
+import sys, json, io, contextlib
+
+_frames = []
+_MAX = 800
+
+def _snap(loc):
+    out = {}
+    for k, v in loc.items():
+        if k.startswith('__'):
+            continue
+        try:
+            if isinstance(v, bool) or isinstance(v, (int, float, str, type(None))):
+                out[k] = {"t": "scalar", "v": repr(v)}
+            elif isinstance(v, (list, tuple)):
+                out[k] = {"t": "seq", "v": [repr(x) for x in list(v)[:20]], "n": len(v)}
+            elif isinstance(v, dict):
+                out[k] = {"t": "dict", "v": [[repr(a), repr(b)] for a, b in list(v.items())[:20]], "n": len(v)}
+            elif isinstance(v, set):
+                out[k] = {"t": "set", "v": [repr(x) for x in list(v)[:20]], "n": len(v)}
+            elif callable(v) or isinstance(v, type):
+                continue
+            else:
+                out[k] = {"t": "scalar", "v": "<" + type(v).__name__ + ">"}
+        except Exception:
+            continue
+    return out
+
+def _tracer(frame, event, arg):
+    if frame.f_code.co_filename != "<solution>":
+        return None
+    if event == "line" and len(_frames) < _MAX:
+        _frames.append({"line": frame.f_lineno, "fn": frame.f_code.co_name, "vars": _snap(frame.f_locals)})
+    return _tracer
+
+_result_payload = {"ok": True, "err": "", "frames": [], "truncated": False}
+_ns = {}
+_buf = io.StringIO()
+try:
+    _obj = compile(_trace_code, "<solution>", "exec")
+    with contextlib.redirect_stdout(_buf):
+        exec(_obj, _ns)
+    _t = compile(_trace_test, "<driver>", "exec")
+    sys.settrace(_tracer)
+    try:
+        with contextlib.redirect_stdout(_buf):
+            exec(_t, _ns)
+    finally:
+        sys.settrace(None)
+    _result_payload["frames"] = _frames
+    _result_payload["truncated"] = len(_frames) >= _MAX
+    _result_payload["final"] = repr(_ns.get("_result"))
+except Exception as e:
+    sys.settrace(None)
+    _result_payload["ok"] = False
+    _result_payload["err"] = type(e).__name__ + ": " + str(e)
+    _result_payload["frames"] = _frames
+
+json.dumps(_result_payload)
+    `);
+    data=JSON.parse(raw);
+  }catch(e){
+    boxEl.innerHTML='<div class="warnbox">The tracer could not run this code: '+esc(String(e).split("\n")[0])+'</div>';
+    return;
+  }
+
+  if(!data.frames.length){
+    boxEl.innerHTML='<div class="warnbox">No lines were executed. '+
+      (data.err?'Python reported: <code>'+esc(data.err)+'</code>':'Check that your test case actually calls the function you defined.')+'</div>';
+    return;
+  }
+  TR={ frames:data.frames, lines:code.replace(/\t/g,"    ").split("\n"), step:0, playing:null,
+       label:label, err:data.err, truncated:data.truncated, final:data.final, test:testCode };
+  renderTracer();
+}
+
+function narrate(f, prev){
+  const line=(TR.lines[f.line-1]||"").trim();
+  const changes=[];
+  if(prev){
+    for(const k in f.vars){
+      const now=JSON.stringify(f.vars[k]), before=prev.vars[k]?JSON.stringify(prev.vars[k]):null;
+      if(before===null) changes.push("<code>"+k+"</code> was created");
+      else if(before!==now) changes.push("<code>"+k+"</code> changed");
+    }
+  }
+  let s="<b>Line "+f.line+"</b>";
+  if(f.fn && f.fn!=="<module>") s+=" &middot; inside <code>"+f.fn+"()</code>";
+  s+=" &mdash; about to run <code>"+esc(line)+"</code>";
+  if(changes.length) s+=". Since the last step: "+changes.slice(0,4).join(", ")+".";
+  return s;
+}
+
+function vizVars(vars, prev){
+  const keys=Object.keys(vars);
+  if(!keys.length) return '<div class="tempty">no local variables yet</div>';
+  return keys.map(k=>{
+    const v=vars[k];
+    const changed = !prev || !prev[k] || JSON.stringify(prev[k])!==JSON.stringify(v);
+    let body;
+    if(v.t==="scalar"){
+      body='<div class="tscalar '+(changed?"chg":"")+'">'+esc(v.v)+'</div>';
+    } else if(v.t==="seq"||v.t==="set"){
+      body = v.v.length ? '<div class="tcells">'+v.v.map((x,i)=>
+        '<div class="tcw"><div class="tcell '+(changed?"chg":"")+'">'+esc(x)+'</div>'+
+        (v.t==="seq"?'<div class="tix">'+i+'</div>':'')+'</div>').join("")+
+        (v.n>20?'<div class="tempty">+'+(v.n-20)+' more</div>':'')+'</div>'
+        : '<div class="tempty">empty</div>';
+    } else {
+      body = v.v.length ? v.v.map(([a,b])=>'<div class="tkv '+(changed?"chg":"")+'">'+esc(a)+' \u2192 '+esc(b)+'</div>').join("")+
+        (v.n>20?'<div class="tempty">+'+(v.n-20)+' more</div>':'')
+        : '<div class="tempty">empty</div>';
+    }
+    const ty={scalar:"value",seq:"list",dict:"dict",set:"set"}[v.t];
+    return '<div class="tvar"><div class="tvname">'+esc(k)+'<span class="ty">'+ty+'</span></div>'+body+'</div>';
+  }).join("");
+}
+
+function renderTracer(){
+  const box=document.getElementById("tracerBox");
+  const f=TR.frames[TR.step], prev=TR.step>0?TR.frames[TR.step-1]:null;
+  const ran=new Set(); for(let i=0;i<=TR.step;i++) ran.add(TR.frames[i].line);
+  box.innerHTML=
+    '<div class="tracer">'+
+      '<div class="tracer-head">Walking through '+esc(TR.label)+
+        '<span class="p-tag">test: '+esc(TR.test.replace(/\n/g," ; ").slice(0,60))+'</span>'+
+        '<button class="close" id="trClose">Close</button></div>'+
+      '<div class="tsplit">'+
+        '<div class="tcode" id="trCode">'+TR.lines.map((c,i)=>
+          '<div class="tline'+((i+1)===f.line?" active":(ran.has(i+1)?" ran":""))+'"><span class="ln">'+(i+1)+'</span><span>'+
+          (c===""?"&nbsp;":esc(c))+'</span></div>').join("")+'</div>'+
+        '<div class="tside">'+vizVars(f.vars, prev?prev.vars:null)+'</div>'+
+      '</div>'+
+      '<div class="tnarr">'+narrate(f,prev)+'</div>'+
+      '<div class="tctrl">'+
+        '<button id="trPrev">&larr; Back</button>'+
+        '<button class="btn-run" id="trPlay">'+(TR.playing?"\u258C\u258C Pause":"\u25B6 Play")+'</button>'+
+        '<button id="trNext">Step &rarr;</button>'+
+        '<button id="trRestart">Restart</button>'+
+        '<span class="tpos">step '+(TR.step+1)+' / '+TR.frames.length+
+          (TR.truncated?' (capped)':'')+'</span>'+
+      '</div>'+
+      (TR.err?'<div class="warnbox" style="margin:0;border-radius:0">Execution stopped with an error: <code>'+esc(TR.err)+'</code>. The steps above show exactly how far it got \u2014 that is usually where the bug is.</div>':'')+
+    '</div>';
+  const active=box.querySelector(".tline.active");
+  if(active) active.scrollIntoView({block:"nearest"});
+  document.getElementById("trPrev").disabled=TR.step===0;
+  document.getElementById("trNext").disabled=TR.step===TR.frames.length-1;
+  document.getElementById("trClose").addEventListener("click",()=>{ trStop(); box.innerHTML=""; });
+  document.getElementById("trPrev").addEventListener("click",()=>{ if(TR.step>0){ TR.step--; renderTracer(); } });
+  document.getElementById("trNext").addEventListener("click",()=>{ if(TR.step<TR.frames.length-1){ TR.step++; renderTracer(); } });
+  document.getElementById("trRestart").addEventListener("click",()=>{ trStop(); TR.step=0; renderTracer(); });
+  document.getElementById("trPlay").addEventListener("click",()=>{
+    if(TR.playing){ trStop(); renderTracer(); return; }
+    if(TR.step===TR.frames.length-1) TR.step=0;
+    TR.playing=setInterval(()=>{
+      if(TR.step<TR.frames.length-1){ TR.step++; renderTracer(); } else { trStop(); renderTracer(); }
+    },1100);
+    renderTracer();
+  });
+}
+function trStop(){ if(TR.playing){ clearInterval(TR.playing); TR.playing=null; } }
+
+/* ================= TOOLBAR ================= */
+document.getElementById("addBtn").addEventListener("click",()=>{
+  const p={ __new:true, id:"custom-"+Date.now(), name:"Untitled problem", diff:"Medium",
+    group:"My Problems", tags:[], prompt:"<p>Describe the problem here.</p>",
+    ex:"my_func([1,2,3])  ->  6",
+    starter:"def my_func(nums):\n    # your code here\n    pass",
+    tests:[{code:"_result = my_func([1,2,3])",expected:"6"}],
+    hint:"", solution:"", explain:"", cx:"" };
+  current=p.id; editing=true; renderForm(p);
+});
+
+document.getElementById("exportBtn").addEventListener("click",()=>{
+  const data=JSON.stringify({overrides:state.overrides,custom:state.custom,deleted:state.deleted},null,2);
+  const panel=document.getElementById("panel");
+  panel.innerHTML='<div class="p-title">Export</div><div class="hintline" style="margin:8px 0">Copy this text and keep it somewhere safe. Paste it into Import to restore your problems later or move them to another device.</div>'+
+    '<textarea class="editor" style="min-height:300px" readonly>'+esc(data)+'</textarea>'+
+    '<div class="actions"><button id="backBtn">Back</button></div>';
+  document.getElementById("backBtn").addEventListener("click",()=>{ renderPanel(); });
+  panel.querySelector("textarea").select();
+});
+
+document.getElementById("importBtn").addEventListener("click",()=>{
+  const panel=document.getElementById("panel");
+  panel.innerHTML='<div class="p-title">Import</div><div class="hintline" style="margin:8px 0">Paste previously exported text. This replaces your current custom problems and edits — your saved code and solved marks are untouched.</div>'+
+    '<textarea class="editor" id="importBox" style="min-height:260px" placeholder="Paste exported JSON here"></textarea>'+
+    '<div class="actions"><button class="btn-run" id="doImport">Import</button><button id="backBtn2">Cancel</button></div>'+
+    '<div class="status" id="status"></div>';
+  document.getElementById("backBtn2").addEventListener("click",()=>renderPanel());
+  document.getElementById("doImport").addEventListener("click",async()=>{
+    try{
+      const d=JSON.parse(document.getElementById("importBox").value);
+      state.overrides=d.overrides||{}; state.custom=d.custom||[]; state.deleted=d.deleted||[];
+      await save(); current=problems()[0]?problems()[0].id:null;
+      renderList(); renderPanel();
+    }catch(e){ setStatus("That doesn't look like valid exported text."); }
+  });
+});
+
+document.getElementById("resetProgress").addEventListener("click",async()=>{
+  if(!confirm("Clear everything — your code, solved marks, custom problems, and edits? This cannot be undone.")) return;
+  state={code:{},solved:{},overrides:{},custom:[],deleted:[]};
+  await save(); current=problems()[0].id; editing=false; renderList(); renderPanel();
+});
+
+/* timer */
+let timerId=null, remaining=45*60;
+function paintTimer(){
+  const m=Math.floor(Math.abs(remaining)/60), s=Math.abs(remaining)%60;
+  const el=document.getElementById("timer");
+  el.textContent=(remaining<0?"-":"")+m+":"+String(s).padStart(2,"0");
+  el.classList.toggle("over",remaining<=0);
+}
+document.getElementById("startTimer").addEventListener("click",e=>{
+  if(timerId){ clearInterval(timerId); timerId=null; remaining=45*60; paintTimer(); e.target.textContent="Start 45-min timer"; return; }
+  e.target.textContent="Stop timer";
+  timerId=setInterval(()=>{ remaining--; paintTimer(); },1000);
+});
+
+paintTimer();
+load().then(()=>{ current=problems()[0].id; renderList(); renderPanel(); });
+</script>
