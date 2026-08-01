@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-GM Energy Interview Prep - Local Practice Runner
+Coding Prep - Local Practice Runner
 ================================================
 
 Runs entirely on your own Python. No browser, no internet, no dependencies.
@@ -818,7 +818,7 @@ def read_user_code(pid):
 
 def cmd_list():
     progress = load_progress()
-    print(f"\n{C.BOLD}GM Energy Prep - Practice Problems{C.OFF}\n")
+    print(f"\n{C.BOLD}Coding Prep - Practice Problems{C.OFF}\n")
     last_group = None
     for pid, p in PROBLEMS.items():
         if p["group"] != last_group:

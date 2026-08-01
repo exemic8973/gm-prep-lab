@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>GM Energy Prep — Coding Practice Lab</title>
+<title>Coding Prep — Coding Practice Lab</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -80,6 +80,20 @@
   .cx{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--muted);margin-top:6px}
   .status{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--muted);margin-top:8px;min-height:15px}
 
+  /* reference glossary */
+  .ref-search{width:100%;font-family:'IBM Plex Sans',sans-serif;font-size:13.5px;padding:9px 12px;border:1px solid var(--line);border-radius:8px;background:#fff;color:var(--ink);margin:2px 0 8px}
+  .ref-search:focus{outline:2px solid var(--charge);outline-offset:1px}
+  .ref-card{border:1px solid var(--line);border-radius:9px;padding:12px 14px;margin:8px 0;background:#fff}
+  .ref-card .p-tag{margin-left:6px}
+  .ref-name{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:15.5px;margin-bottom:6px}
+  .ref-row{font-size:13.5px;line-height:1.6;margin-bottom:5px}
+  .ref-row b{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--charge);display:inline-block;min-width:42px}
+  .ref-row code{font-family:'IBM Plex Mono',monospace;font-size:12px;background:#EEF3F5;padding:1px 5px;border-radius:4px}
+  .ref-practice{background:#F5F8F9;border:1px solid var(--line);border-radius:8px;padding:10px 12px;margin-top:8px}
+  .rp-q{font-size:13.5px;font-weight:600;margin-bottom:8px;line-height:1.5}
+  .rp-q code{font-family:'IBM Plex Mono',monospace;font-size:12px;background:#EEF3F5;padding:1px 5px;border-radius:4px}
+  .rp-ed{min-height:120px !important;margin-top:0}
+
   /* form */
   .form label{display:block;font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:12px 0 4px;font-weight:500}
   .form input[type=text], .form select, .form textarea{width:100%;font-family:'IBM Plex Sans',sans-serif;font-size:13.5px;padding:8px 10px;border:1px solid var(--line);border-radius:7px;background:#fff;color:var(--ink)}
@@ -127,12 +141,13 @@
 </style>
 
 <div class="wrap">
-  <div class="eyebrow">GM Energy Prep &middot; Practice Lab</div>
+  <div class="eyebrow">Coding Prep &middot; Practice Lab</div>
   <h1>Coding Practice Lab</h1>
   <div class="sub">Real Python, real test cases. Edit any problem, add your own, and everything saves automatically.</div>
 
   <div class="statusbar">
     <span class="solvedcount"><b id="solvedN">0</b> / <span id="totalN">0</span> solved</span>
+    <button id="refBtn">&#128218; Reference</button>
     <button id="addBtn">+ New problem</button>
     <button id="exportBtn">Export</button>
     <button id="importBtn">Import</button>
@@ -535,6 +550,258 @@ class TimeMap:
             return True
         return False`,
  explain:"Lazy refill is the key idea — no timers, constant time and space per client. The cap allows controlled bursts while holding the long-run average. Follow-ups to have ready: distributed version (Redis + atomic Lua script, since read-modify-write races), per-client memory cost, and how this differs from a sliding-window counter.",cx:"Time O(1) · Space O(1) per client"}
+];
+
+/* ================= REFERENCE (GLOSSARY) ================= */
+/* Every term & pattern used in the problems: what it is, when to use it,
+   how to write it, plus a quick practice with real test cases. */
+const REFERENCE = [
+/* ---- Python Essentials ---- */
+{id:"enumerate",name:"enumerate()",cat:"Python Essentials",tags:["builtin","loop","index"],
+ what:`Adds a running counter to any iterable, yielding <code>(index, value)</code> pairs — the Pythonic way to loop when you need both the position and the element.`,
+ when:`Any time a loop needs the index. If you catch yourself writing <code>i = 0</code> and then <code>i += 1</code> inside a <code>for</code> loop, you probably want <code>enumerate()</code>. Also handy for building index maps.`,
+ how:`<code>for i, x in enumerate(items)</code> — each item comes out as a tuple, so unpack both names in the loop header. Start at any offset with <code>enumerate(items, start=1)</code>.`,
+ ex:`for i, ch in enumerate("abc"):\n    print(i, ch)\n# 0 a\n# 1 b\n# 2 c`,
+ practice:`Return the indices of every 0 in <code>nums</code>, in order.`,
+ starter:`def zero_indices(nums):\n    # loop with enumerate(); collect the indices of 0\n    pass`,
+ tests:[{code:`_result = zero_indices([3, 0, 5, 0, 0])`,expected:`[1, 3, 4]`},{code:`_result = zero_indices([1, 2, 3])`,expected:`[]`}]},
+
+{id:"dict-get",name:"dict & .get()",cat:"Python Essentials",tags:["hash map","builtin"],
+ what:`A hash map: O(1) insert, lookup, and delete. <code>d.get(k, default)</code> returns <code>default</code> instead of raising <code>KeyError</code> when the key is missing.`,
+ when:`The workhorse for "have I seen this before?", value-to-index maps (Two Sum), counting, and caching. When a solution is O(n), a dict is usually doing the heavy lifting.`,
+ how:`<code>d[k] = v</code> to store, <code>k in d</code> to check, <code>d.get(k, 0)</code> for safe reads. Iterating a dict yields its keys.`,
+ ex:`seen = {}\nfor i, x in enumerate(nums):\n    if x in seen:\n        return [seen[x], i]\n    seen[x] = i`,
+ practice:`Count how many times each character appears in <code>s</code> and return the dict.`,
+ starter:`def char_counts(s):\n    # build {char: count} manually with a dict\n    pass`,
+ tests:[{code:`_result = char_counts("aabbc")`,expected:`{'a': 2, 'b': 2, 'c': 1}`},{code:`_result = char_counts("")`,expected:`{}`}]},
+
+{id:"counter",name:"Counter",cat:"Python Essentials",tags:["collections","counting"],
+ what:`A dict subclass that counts things for you: <code>Counter(iterable)</code> builds a frequency map in one call, and <code>.most_common(k)</code> returns the top k.`,
+ when:`Any frequency problem — "most frequent element", "top k", anagram detection. Less code and fewer bugs than a manual counting loop.`,
+ how:`<code>from collections import Counter</code>, then <code>c = Counter(words)</code>. Reads default to 0 (<code>c[x]</code> never raises), <code>c.most_common(1)</code> returns <code>[(value, count)]</code>.`,
+ ex:`from collections import Counter\n\nCounter([1,1,1,2,2,3]).most_common(2)\n# [(1, 3), (2, 2)]`,
+ practice:`Return the character that appears most often in <code>s</code>.`,
+ starter:`from collections import Counter\n\ndef most_common_char(s):\n    # Counter(s).most_common(1)\n    pass`,
+ tests:[{code:`_result = most_common_char("aabbc")`,expected:`'a'`},{code:`_result = most_common_char("zzzyyyx")`,expected:`'z'`}]},
+
+{id:"defaultdict",name:"defaultdict",cat:"Python Essentials",tags:["collections","grouping"],
+ what:`A dict that auto-creates a value with a factory when you touch a missing key — <code>defaultdict(list)</code>, <code>defaultdict(int)</code>.`,
+ when:`Grouping items (Group Anagrams), building adjacency lists, counting — anywhere you'd otherwise write an <code>if k not in d</code> guard.`,
+ how:`<code>from collections import defaultdict; groups = defaultdict(list)</code>, then <code>groups[key].append(x)</code> just works for new keys.`,
+ ex:`groups = defaultdict(list)\nfor w in words:\n    groups[tuple(sorted(w))].append(w)`,
+ practice:`Group words by their first letter; return a dict mapping each letter to its list of words.`,
+ starter:`from collections import defaultdict\n\ndef group_by_first(strs):\n    # defaultdict(list) + append\n    pass`,
+ tests:[{code:`_result = group_by_first(["apple", "avocado", "banana"])`,expected:`{'a': ['apple', 'avocado'], 'b': ['banana']}`},{code:`_result = group_by_first([])`,expected:`{}`}]},
+
+{id:"unpacking",name:"Tuple unpacking",cat:"Python Essentials",tags:["syntax","tuples"],
+ what:`Assign multiple names from an iterable in one line: <code>a, b = pair</code>. The <code>for a, b in pairs</code> loop header is the same trick.`,
+ when:`Any time your data comes in pairs or triples — intervals, (key, value) items, coordinates — and in loops over lists of them.`,
+ how:`<code>start, end = interval</code>; swap without a temp variable: <code>a, b = b, a</code>; loop: <code>for name, score in results:</code>`,
+ ex:`pairs = [(1, 3), (2, 6)]\nfor a, b in pairs:\n    print(a, b)\n# 1 3\n# 2 6`,
+ practice:`Return a list of the sums of each pair.`,
+ starter:`def sum_pairs(pairs):\n    # unpack each pair as a, b\n    pass`,
+ tests:[{code:`_result = sum_pairs([(1, 2), (3, 4), (5, 6)])`,expected:`[3, 7, 11]`},{code:`_result = sum_pairs([])`,expected:`[]`}]},
+
+{id:"sorted-key",name:"sorted() with key",cat:"Python Essentials",tags:["sorting","lambda"],
+ what:`<code>sorted(iterable, key=fn)</code> sorts using a function that extracts the sort value from each element — the original elements stay in the result.`,
+ when:`Sorting by anything other than the raw value: by length, by the second element of a tuple, by a computed field. Replaces awkward comparator functions.`,
+ how:`<code>sorted(words, key=len)</code>, <code>sorted(pairs, key=lambda p: p[1])</code>. Descending: <code>reverse=True</code>.`,
+ ex:`sorted(["bb", "a", "ccc"], key=len)\n# ['a', 'bb', 'ccc']`,
+ practice:`Return the pairs sorted by their second value (ascending).`,
+ starter:`def sort_by_second(pairs):\n    # sorted(pairs, key=...)\n    pass`,
+ tests:[{code:`_result = sort_by_second([(1, 3), (2, 1), (3, 2)])`,expected:`[(2, 1), (3, 2), (1, 3)]`},{code:`_result = sort_by_second([])`,expected:`[]`}]},
+
+{id:"comprehension",name:"List comprehension",cat:"Python Essentials",tags:["syntax","lists"],
+ what:`Builds a list from an expression over an iterable, with an optional filter: <code>[expr for x in items if cond]</code>.`,
+ when:`Transforming or filtering a list in one readable line. If the result is a plain list and the loop would be 3 lines, compress it.`,
+ how:`<code>[x * 2 for x in nums]</code>, <code>[x for x in nums if x &gt; 0]</code>. Nesting is possible but hurts readability — keep it flat.`,
+ ex:`[x ** 2 for x in range(6) if x % 2 == 0]\n# [0, 4, 16]`,
+ practice:`Return a list of the squares of the even numbers in <code>nums</code>.`,
+ starter:`def squares_of_evens(nums):\n    # one list comprehension\n    pass`,
+ tests:[{code:`_result = squares_of_evens([1, 2, 3, 4])`,expected:`[4, 16]`},{code:`_result = squares_of_evens([1, 3, 5])`,expected:`[]`}]},
+
+{id:"set",name:"set membership",cat:"Python Essentials",tags:["set","dedupe"],
+ what:`A set stores unique values with O(1) membership checks — <code>x in s</code>, and dedupe via <code>set(items)</code>.`,
+ when:`"Did I see this before?", uniqueness, dedupe. In Longest Consecutive Sequence the set turns the solution from O(n log n) into O(n).`,
+ how:`<code>s = set(nums)</code>, <code>if x in s:</code>, <code>s.add(x)</code>. Iterating works but order is not guaranteed.`,
+ ex:`num_set = set([100, 4, 200, 1, 3, 2])\n101 in num_set     # False — no predecessor\n2 in num_set       # True`,
+ practice:`Return how many distinct values <code>nums</code> has.`,
+ starter:`def unique_count(nums):\n    # set() + len()\n    pass`,
+ tests:[{code:`_result = unique_count([1, 1, 2, 2, 3])`,expected:`3`},{code:`_result = unique_count([])`,expected:`0`}]},
+
+{id:"slicing",name:"Slicing",cat:"Python Essentials",tags:["syntax","strings"],
+ what:`<code>seq[i:j:step]</code> extracts a sub-sequence; negative indices count from the end; <code>seq[::-1]</code> reverses.`,
+ when:`Subarrays/substrings, palindrome checks (<code>s == s[::-1]</code>), reversing or rotating parts of a list. For performance-critical loops, prefer two pointers over making copies.`,
+ how:`<code>nums[1:3]</code> → elements 1 and 2; <code>s[-1]</code> → last character; <code>s[::-1]</code> → reversed.`,
+ ex:`s = "abcdef"\ns[1:4]    # 'bcd'\ns[-1]     # 'f'\ns[::-1]   # 'fedcba'`,
+ practice:`Return True if <code>s</code> is a palindrome (same forwards and backwards).`,
+ starter:`def is_palindrome(s):\n    # compare s with s[::-1]\n    pass`,
+ tests:[{code:`_result = is_palindrome("racecar")`,expected:`True`},{code:`_result = is_palindrome("hello")`,expected:`False`},{code:`_result = is_palindrome("")`,expected:`True`}]},
+
+/* ---- Collections & Tools ---- */
+{id:"deque",name:"deque",cat:"Collections & Tools",tags:["collections","queue","bfs"],
+ what:`A double-ended queue from <code>collections</code> with O(1) append/pop on BOTH ends — <code>popleft()</code> is the reason it exists.`,
+ when:`BFS queues, sliding windows, any queue where you pop from the front. A plain list pops from the front in O(n) — that will time out on big inputs.`,
+ how:`<code>from collections import deque; q = deque([start]); q.popleft(); q.append(x)</code>.`,
+ ex:`q = deque([1, 2, 3])\nq.popleft()    # 1\nq.append(4)   # q is now deque([2, 3, 4])`,
+ practice:`Pop everything off the front of a deque containing <code>range(n)</code> and return the values in FIFO order.`,
+ starter:`from collections import deque\n\ndef fifo_order(n):\n    # build deque(range(n)); popleft() until empty\n    pass`,
+ tests:[{code:`_result = fifo_order(4)`,expected:`[0, 1, 2, 3]`},{code:`_result = fifo_order(0)`,expected:`[]`}]},
+
+{id:"heapq",name:"heapq",cat:"Collections & Tools",tags:["heap","priority queue"],
+ what:`Binary heap in the standard library: <code>heappush</code> and <code>heappop</code> are both O(log n), plus <code>heapreplace</code>, <code>nlargest</code>, <code>nsmallest</code>. Python's heap is a min-heap.`,
+ when:`"Top k" problems (Top K Frequent), always-available-minimum problems (Meeting Rooms), priority queues. O(log n) pushes, O(1) peeks at the smallest.`,
+ how:`<code>import heapq; heapq.heappush(h, x); heapq.heappop(h)</code>. For a max-heap, store negatives or a priority tuple.`,
+ ex:`h = []\nfor x in [3, 1, 2]:\n    heapq.heappush(h, x)\nheapq.heappop(h)    # 1`,
+ practice:`Return the k smallest numbers in <code>nums</code>, in ascending order.`,
+ starter:`import heapq\n\ndef k_smallest(nums, k):\n    # heapq.nsmallest(k, nums)\n    pass`,
+ tests:[{code:`_result = k_smallest([3, 1, 2, 5, 4], 2)`,expected:`[1, 2]`},{code:`_result = k_smallest([], 0)`,expected:`[]`}]},
+
+{id:"bisect",name:"bisect",cat:"Collections & Tools",tags:["binary search","sorted"],
+ what:`Binary search on sorted sequences: <code>bisect_left(a, x)</code> returns the first index where x fits (first element &gt;= x); <code>bisect_right</code> the first index &gt; x. Both O(log n).`,
+ when:`Searching sorted data, "largest value &lt;= target" (TimeMap!), and anywhere the data is sorted but a scan is too slow.`,
+ how:`<code>from bisect import bisect_left, bisect_right</code>. For "rightmost entry &lt;= t": <code>i = bisect_right(entries, (t, chr(0x10FFFF)))</code>, then read <code>entries[i - 1]</code>.`,
+ ex:`a = [10, 20, 30]\nbisect_right(a, 20)    # 2 — insertion point after the 20`,
+ practice:`Count how many numbers in the sorted list are &lt;= x.`,
+ starter:`from bisect import bisect_right\n\ndef count_leq(sorted_nums, x):\n    # bisect_right gives the count directly\n    pass`,
+ tests:[{code:`_result = count_leq([10, 20, 30, 40], 25)`,expected:`2`},{code:`_result = count_leq([], 5)`,expected:`0`}]},
+
+{id:"ordereddict",name:"OrderedDict",cat:"Collections & Tools",tags:["dict","lru"],
+ what:`A dict that remembers insertion order and can reorder entries: <code>move_to_end(key)</code> marks something as newest, <code>popitem(last=False)</code> evicts the oldest.`,
+ when:`LRU caches — O(1) "mark as recently used" plus O(1) "evict the oldest". A plain dict keeps insertion order but can't reorder.`,
+ how:`<code>od.move_to_end(k)</code> on every access; on insert, if over capacity, <code>od.popitem(last=False)</code>.`,
+ ex:`od = OrderedDict([("a", 1), ("b", 2)])\nod.move_to_end("a")\nlist(od)    # ['b', 'a']`,
+ practice:`Move <code>key</code> to the end of the OrderedDict and return the resulting key order.`,
+ starter:`from collections import OrderedDict\n\ndef touch(od, key):\n    # move_to_end(key) then list(od)\n    pass`,
+ tests:[{code:`_result = touch(OrderedDict([("a",1),("b",2),("c",3)]), "a")`,expected:`['b', 'c', 'a']`},{code:`_result = touch(OrderedDict([("x",9)]), "x")`,expected:`['x']`}]},
+
+/* ---- Data Structures ---- */
+{id:"hash-map-pattern",name:"Hash map pattern",cat:"Data Structures",tags:["hash map","two sum"],
+ what:`The dict-as-index pattern: store something about each element (its index, its count) as you go, so later elements can answer in O(1).`,
+ when:`Two Sum (complement lookup), "did this pair/prefix exist", caching values. The tell: you iterate once and wish you remembered what you saw.`,
+ how:`Walk the array once. For each element, check the dict for the answer, then store the element for future elements to find.`,
+ ex:`seen = {}\nfor i, num in enumerate(nums):\n    if target - num in seen:\n        return [seen[target - num], i]\n    seen[num] = i`,
+ practice:`Return True if any two numbers in <code>nums</code> add up to <code>target</code>.`,
+ starter:`def has_pair_sum(nums, target):\n    # one pass: check the complement in a set, then add\n    pass`,
+ tests:[{code:`_result = has_pair_sum([2, 7, 11, 15], 9)`,expected:`True`},{code:`_result = has_pair_sum([1, 2, 3], 8)`,expected:`False`},{code:`_result = has_pair_sum([], 1)`,expected:`False`}]},
+
+{id:"stack",name:"Stack",cat:"Data Structures",tags:["stack","lifo"],
+ what:`LIFO structure — append to the top, pop from the top, last in is first out. Python's list is a perfectly good stack.`,
+ when:`Nesting/balancing (parentheses), undo/redo, "previous smaller/greater element", DFS, and any problem where the latest item decides the outcome.`,
+ how:`<code>stack.append(x); x = stack.pop()</code>. Guard the empty case: <code>if not stack:</code> before popping.`,
+ ex:`stack = []\nfor ch in "({[]})":\n    if ch in "([{":\n        stack.append(ch)\n    else:\n        stack.pop()    # it matched the top`,
+ practice:`Return True if the parentheses in <code>s</code> are balanced — ignore everything that isn't '(' or ')'.`,
+ starter:`def balanced_parens(s):\n    # stack of '('; pop on ')'\n    pass`,
+ tests:[{code:`_result = balanced_parens("(())")`,expected:`True`},{code:`_result = balanced_parens("(()")`,expected:`False`},{code:`_result = balanced_parens(")(")`,expected:`False`},{code:`_result = balanced_parens("")`,expected:`True`}]},
+
+{id:"queue",name:"Queue (FIFO)",cat:"Data Structures",tags:["queue","fifo","bfs"],
+ what:`First-in, first-out structure. Use a <code>deque</code> so popping the front is O(1).`,
+ when:`Breadth-first search, level-order processing, round-robin work. BFS explores in order of distance, which is why it finds shortest paths in unweighted graphs.`,
+ how:`<code>q = deque([start]); while q: node = q.popleft(); ...; q.append(next)</code>. Mark visited when you enqueue, not when you pop.`,
+ ex:`q = deque(["a"])\nq.append("b")\nq.popleft()    # 'a' — FIFO order`,
+ practice:`Return the values reachable from <code>start</code> by BFS, in visit order. The graph is an adjacency dict.`,
+ starter:`from collections import deque\n\ndef bfs_reach(graph, start):\n    # deque + visited set; collect nodes in visit order\n    pass`,
+ tests:[{code:`_result = bfs_reach({0:[1], 1:[2], 2:[]}, 0)`,expected:`[0, 1, 2]`},{code:`_result = bfs_reach({0:[1], 1:[0]}, 0)`,expected:`[0, 1]`}]},
+
+{id:"linked-list",name:"Linked list (sentinels)",cat:"Data Structures",tags:["linked list","lru"],
+ what:`Nodes linked by pointers. In a doubly linked list each node knows prev and next; sentinel (dummy) head/tail nodes remove every null check.`,
+ when:`O(1) insert/delete at a known position, LRU caches, and interviews testing pointer hygiene. Reach for it when you must unlink a node in O(1).`,
+ how:`Two sentinels always exist. To remove a node: <code>node.prev.next = node.next; node.next.prev = node.prev</code>.`,
+ ex:`class Node:\n    def __init__(self, key=0, val=0):\n        self.key, self.val = key, val\n        self.prev = self.next = None`,
+ practice:`Count the nodes in a linked list. <code>Node</code> has <code>.next</code> (None at the tail).`,
+ starter:`class Node:\n    def __init__(self, val=0, nxt=None):\n        self.val, self.next = val, nxt\n\ndef count_nodes(head):\n    # walk .next until None\n    pass`,
+ tests:[{code:`_result = count_nodes(Node(1, Node(2, Node(3))))`,expected:`3`},{code:`_result = count_nodes(None)`,expected:`0`}]},
+
+{id:"graph-adjacency",name:"Graph adjacency list",cat:"Data Structures",tags:["graph"],
+ what:`A graph stored as a map from node to its neighbors: <code>adj[u] = [v1, v2]</code>.`,
+ when:`Any "connected things" problem — courses and prerequisites, friend networks, islands, routes. Building the adjacency list well is usually step one.`,
+ how:`<code>adj = defaultdict(list); adj[prereq].append(course)</code>. For grids, neighbors come from the four directions instead of a list.`,
+ ex:`adj = {0: [1, 2], 1: [], 2: [1]}\nadj[0]    # [1, 2] — 0 connects to 1 and 2`,
+ practice:`Return the sorted list of neighbors of <code>node</code>.`,
+ starter:`def neighbors(graph, node):\n    # sorted(graph.get(node, []))\n    pass`,
+ tests:[{code:`_result = neighbors({1:[3,2], 2:[]}, 1)`,expected:`[2, 3]`},{code:`_result = neighbors({1:[3,2], 2:[]}, 2)`,expected:`[]`}]},
+
+/* ---- Algorithms & Patterns ---- */
+{id:"two-pointers",name:"Two pointers",cat:"Algorithms & Patterns",tags:["two pointers","sorted array"],
+ what:`Two indexes moving through the data — often one from each end — each moving O(1) times total, for O(n) overall.`,
+ when:`Sorted-array pairs (pair sums), Container With Most Water, palindrome checks, merging. Key question: which pointer can only make things better by moving?`,
+ how:`Start at both ends. Each step, use the current pair, then move the pointer that decides the outcome — the shorter line in water, the side that adjusts toward the target in pair sums.`,
+ ex:`left, right = 0, len(a) - 1\nwhile left < right:\n    s = a[left] + a[right]\n    if s == target: return [left, right]\n    if s < target: left += 1\n    else: right -= 1`,
+ practice:`In the sorted list, find two numbers that sum to <code>target</code>; return their indices, or [] if none.`,
+ starter:`def pair_sum_sorted(sorted_nums, target):\n    # two pointers from both ends\n    pass`,
+ tests:[{code:`_result = pair_sum_sorted([1, 2, 4, 7], 9)`,expected:`[1, 3]`},{code:`_result = pair_sum_sorted([1, 2, 4, 7], 20)`,expected:`[]`}]},
+
+{id:"sliding-window",name:"Sliding window",cat:"Algorithms & Patterns",tags:["two pointers","subarray"],
+ what:`Maintain a contiguous window with two indexes: grow the right edge, shrink the left edge when the constraint breaks. Often O(n) where brute force is O(n²).`,
+ when:`"Longest/shortest subarray or substring satisfying a condition", max/min over every k-length window. The constraint makes the shrink direction deterministic.`,
+ how:`Extend right; while the window violates the rule, advance left; record the best window at each valid state.`,
+ ex:`left = best = 0\nfor right, ch in enumerate(s):\n    # if ch is a duplicate: shrink left past it\n    best = max(best, right - left + 1)`,
+ practice:`Return the maximum sum of any window of exactly k numbers.`,
+ starter:`def max_sum_k(nums, k):\n    # sliding window of size k\n    pass`,
+ tests:[{code:`_result = max_sum_k([2, 1, 5, 1, 3, 2], 3)`,expected:`9`},{code:`_result = max_sum_k([1, 1, 1], 1)`,expected:`1`}]},
+
+{id:"monotonic-stack",name:"Monotonic stack",cat:"Algorithms & Patterns",tags:["stack","next greater"],
+ what:`A stack whose values are always increasing or decreasing — each push pops everything "worse" first, so the stack stays ordered.`,
+ when:`"Next greater/smaller element" problems (Daily Temperatures), stock span, histogram area. The tell: each element compares with predecessors and the answer depends on the nearest one.`,
+ how:`Store indexes. For next-greater: pop while the current value beats the top; each popped index gets resolved by the current one. Amortized O(n) — every index is pushed and popped once.`,
+ ex:`stack = []\nfor i, temp in enumerate(temps):\n    while stack and temps[stack[-1]] < temp:\n        prev = stack.pop()\n        result[prev] = i - prev\n    stack.append(i)`,
+ practice:`For each number, return the next number to its right that is greater, or -1.`,
+ starter:`def next_greater(nums):\n    # monotonic stack of indexes\n    pass`,
+ tests:[{code:`_result = next_greater([2, 1, 3])`,expected:`[3, 3, -1]`},{code:`_result = next_greater([3, 2, 1])`,expected:`[-1, -1, -1]`},{code:`_result = next_greater([])`,expected:`[]`}]},
+
+{id:"prefix-sums",name:"Prefix sums",cat:"Algorithms & Patterns",tags:["prefix","range query"],
+ what:`An array where prefix[i] is the sum (or product) of everything before i — built in one pass, after which any range query is O(1).`,
+ when:`Range sum queries, "product of everything except myself", subarray sums, running totals. The pattern: sweep left, sweep right, combine.`,
+ how:`One loop builds the prefix; a second sweep from the other side supplies the suffix side of each index.`,
+ ex:`prefix = []\ntotal = 0\nfor x in nums:\n    total += x\n    prefix.append(total)`,
+ practice:`Return the running sums of <code>nums</code>.`,
+ starter:`def running_sum(nums):\n    # prefix array\n    pass`,
+ tests:[{code:`_result = running_sum([1, 2, 3, 4])`,expected:`[1, 3, 6, 10]`},{code:`_result = running_sum([])`,expected:`[]`}]},
+
+{id:"interval-merge",name:"Interval merge",cat:"Algorithms & Patterns",tags:["intervals","sorting"],
+ what:`Sort intervals by start, then walk once: extend the current interval if the next one overlaps, otherwise start a new one.`,
+ when:`Overlap/merge/scheduling problems (Merge Intervals, Insert Interval, Meeting Rooms). Sorting by start is what makes the one-pass walk valid.`,
+ how:`After sorting: if <code>next.start &lt;= current.end</code>, <code>current.end = max(current.end, next.end)</code> — the max() matters for fully nested intervals — else append and move on.`,
+ ex:`intervals.sort(key=lambda x: x[0])\nfor s, e in intervals[1:]:\n    if s <= merged[-1][1]:\n        merged[-1][1] = max(merged[-1][1], e)\n    else:\n        merged.append([s, e])`,
+ practice:`Return True if intervals <code>a</code> and <code>b</code> overlap (touching counts as overlapping).`,
+ starter:`def overlaps(a, b):\n    # a and b are [start, end]\n    pass`,
+ tests:[{code:`_result = overlaps([1, 3], [2, 4])`,expected:`True`},{code:`_result = overlaps([1, 2], [3, 4])`,expected:`False`},{code:`_result = overlaps([1, 2], [2, 3])`,expected:`True`}]},
+
+{id:"binary-search",name:"Binary search",cat:"Algorithms & Patterns",tags:["search","sorted"],
+ what:`Halve the search space each step on sorted data — O(log n). <code>lo</code> and <code>hi</code> close in on the answer.`,
+ when:`Sorted arrays, "first/last element satisfying a predicate", and "largest stored timestamp &lt;= t" (TimeMap). It's also what <code>bisect</code> does for you.`,
+ how:`<code>while lo &lt;= hi: mid = (lo + hi) // 2</code>; decide which half can't contain the answer and move lo or hi past mid.`,
+ ex:`lo, hi = 0, len(a) - 1\nwhile lo <= hi:\n    mid = (lo + hi) // 2\n    if a[mid] < x: lo = mid + 1\n    else: hi = mid - 1\n# lo is the first index with a[lo] >= x`,
+ practice:`Return the index of the first number &gt;= x (len(nums) if none).`,
+ starter:`def first_ge(sorted_nums, x):\n    # binary search — or from bisect import bisect_left\n    pass`,
+ tests:[{code:`_result = first_ge([10, 20, 30], 25)`,expected:`2`},{code:`_result = first_ge([10, 20, 30], 10)`,expected:`0`},{code:`_result = first_ge([10, 20, 30], 99)`,expected:`3`}]},
+
+{id:"bfs-dfs",name:"BFS & DFS",cat:"Algorithms & Patterns",tags:["graph","traversal"],
+ what:`Two ways to explore a graph. BFS uses a queue (level by level — shortest paths); DFS uses a stack or recursion (depth first). Both need a visited set so nothing is revisited.`,
+ when:`Reachability, connected regions (islands), shortest path in unweighted graphs (BFS), cycle detection (DFS). Mark nodes when you ENQUEUE, or the same node enters twice.`,
+ how:`BFS: <code>q = deque([start]); while q: node = q.popleft(); for nxt in adj[node]: if nxt not in seen: seen.add(nxt); q.append(nxt)</code>. DFS: same shape, recursive or with an explicit stack.`,
+ ex:`q = deque([start])\nwhile q:\n    node = q.popleft()\n    for nxt in adj[node]:\n        if nxt not in seen:\n            seen.add(nxt)\n            q.append(nxt)`,
+ practice:`Count how many nodes are reachable from <code>start</code>, including start itself.`,
+ starter:`from collections import deque\n\ndef reachable_count(graph, start):\n    # BFS or DFS with a visited set\n    pass`,
+ tests:[{code:`_result = reachable_count({0:[1], 1:[2], 2:[0]}, 0)`,expected:`3`},{code:`_result = reachable_count({0:[1], 1:[2], 2:[]}, 2)`,expected:`1`}]},
+
+{id:"topo-sort",name:"Topological sort (Kahn's)",cat:"Algorithms & Patterns",tags:["graph","cycle detection"],
+ what:`Order nodes so every edge points forward. Kahn's algorithm: count in-degrees, process nodes with in-degree 0, decrement their neighbors. If you can't process everything — there's a cycle.`,
+ when:`Dependencies: course prerequisites, build order, pipeline DAGs. Also the standard "can everything be done?" cycle detector.`,
+ how:`Build <code>in_degree</code> from the edges. Queue all zero-degree nodes; pop, decrement neighbors, enqueue any that hit 0. Processed count &lt; n means a cycle.`,
+ ex:`queue = deque([c for c in range(n) if in_degree[c] == 0])\nwhile queue:\n    c = queue.popleft(); done += 1\n    for nxt in graph[c]:\n        in_degree[nxt] -= 1\n        if in_degree[nxt] == 0:\n            queue.append(nxt)`,
+ practice:`Return the in-degree of every node (0..n-1). Edges are [course, prereq] — prereq must come before course.`,
+ starter:`def in_degrees(n, edges):\n    # count how many edges point INTO each node\n    pass`,
+ tests:[{code:`_result = in_degrees(3, [[1,0],[2,1]])`,expected:`[0, 1, 1]`},{code:`_result = in_degrees(2, [[1,0],[0,1]])`,expected:`[1, 1]`}]},
+
+{id:"recursion",name:"Recursion",cat:"Algorithms & Patterns",tags:["recursion","dfs"],
+ what:`A function that calls itself on a smaller version of the same problem, with a base case that stops it.`,
+ when:`Tree and graph traversal (DFS), divide-and-conquer, anything with naturally nested structure. Always state the base case first.`,
+ how:`<code>def f(x): if base: return ...; return f(smaller(x))</code>. Every call must shrink toward the base case or you'll blow the stack.`,
+ ex:`def fact(n):\n    return 1 if n <= 1 else n * fact(n - 1)`,
+ practice:`Return n! (factorial).`,
+ starter:`def factorial(n):\n    # base case + recursive call\n    pass`,
+ tests:[{code:`_result = factorial(5)`,expected:`120`},{code:`_result = factorial(0)`,expected:`1`}]}
 ];
 
 /* ================= STATE ================= */
@@ -1080,7 +1347,116 @@ function renderTracer(){
 }
 function trStop(){ if(TR.playing){ clearInterval(TR.playing); TR.playing=null; } }
 
+/* ================= REFERENCE UI ================= */
+let refQuery = "";
+let refRenderToken = 0;   // bumped on every re-render; guards stale async writes
+
+function refCard(e){
+  return '<div class="ref-card">'+
+    '<div class="ref-name">'+esc(e.name)+
+      (e.tags||[]).map(t=>'<span class="p-tag">'+esc(t)+'</span>').join("")+'</div>'+
+    '<div class="ref-row"><b>What</b> '+sanitizeHtml(e.what)+'</div>'+
+    '<div class="ref-row"><b>When</b> '+sanitizeHtml(e.when)+'</div>'+
+    '<div class="ref-row"><b>How</b> '+sanitizeHtml(e.how)+'</div>'+
+    '<div class="ex">'+esc(e.ex)+'</div>'+
+    '<div class="ref-practice">'+
+      '<div class="rp-q">Quick practice: '+sanitizeHtml(e.practice)+'</div>'+
+      '<textarea class="editor rp-ed" id="rp-ed-'+e.id+'" spellcheck="false">'+esc(e.starter)+'</textarea>'+
+      '<div class="actions"><button class="btn-run" id="rp-'+e.id+'">Run practice</button></div>'+
+      '<div class="results" id="rp-res-'+e.id+'"></div>'+
+    '</div>'+
+  '</div>';
+}
+
+function renderReference(){
+  const panel=document.getElementById("panel");
+  refRenderToken++;
+  const q=refQuery.trim().toLowerCase();
+  const byCat={};
+  REFERENCE.forEach(e=>{
+    const hay=(e.name+" "+e.tags.join(" ")+" "+e.what).toLowerCase();
+    if(q && !hay.includes(q)) return;
+    (byCat[e.cat]=byCat[e.cat]||[]).push(e);
+  });
+  let html='<div class="p-title">Python &amp; DS&amp;A Reference</div>'+
+    '<div class="hintline" style="margin:6px 0 10px">Every term used in these problems: what it is, when to reach for it, how to write it \u2014 with a quick practice to run. Type to filter.</div>'+
+    '<input type="text" id="refSearch" class="ref-search" placeholder="Search terms \u2014 e.g. enumerate, heap, sliding window\u2026" value="'+esc(refQuery)+'">'+
+    '<div class="actions" style="margin:2px 0 4px"><button id="refBack">\u2190 Back to problems</button></div>';
+  const shown=new Set();
+  let count=0;
+  REFERENCE.forEach(e=>{
+    const entries=byCat[e.cat]||[];
+    if(!entries.length || shown.has(e.cat)) return;
+    shown.add(e.cat);
+    count+=entries.length;
+    html+='<div class="list-group" style="position:static;margin:14px 0 6px">'+esc(e.cat)+'</div>';
+    entries.forEach(en=>{ html+=refCard(en); });
+  });
+  if(!count) html+='<div class="warnbox">No terms match "'+esc(refQuery)+'". Try "enumerate", "heap", "stack"\u2026</div>';
+  panel.innerHTML=html+'<div class="actions" style="margin-top:10px"><button id="refBack2">\u2190 Back to problems</button></div>';
+  const goBack=()=>renderPanel();
+  document.getElementById("refBack").addEventListener("click",goBack);
+  document.getElementById("refBack2").addEventListener("click",goBack);
+  const search=document.getElementById("refSearch");
+  search.addEventListener("input",()=>{ refQuery=search.value; renderReference(); });
+  search.focus();
+  REFERENCE.forEach(e=>{
+    const btn=document.getElementById("rp-"+e.id);
+    if(btn) btn.addEventListener("click",()=>runPracticeCard(e));
+  });
+}
+
+async function runPracticeCard(e){
+  const token=refRenderToken;   // panel may re-render while we await — write only if still current
+  const btn=document.getElementById("rp-"+e.id), out=document.getElementById("rp-res-"+e.id);
+  if(!e.tests || !e.tests.length){ out.innerHTML='<div class="r-head r-fail">No practice tests defined.</div>'; return; }
+  btn.disabled=true; out.innerHTML="";
+  let py;
+  try{ py=await ensurePyodide(); }
+  catch(err){ btn.disabled=false; out.innerHTML=engineErrorMsg(err); return; }
+  const userCode=document.getElementById("rp-ed-"+e.id).value;
+  const rows=[];
+  for(const t of e.tests){
+    let res;
+    try{
+      py.globals.set("_user_code",userCode);
+      py.globals.set("_test_code",t.code);
+      res=py.runPython(`
+import io, contextlib, traceback
+_ns = {}
+_out = {"ok": False, "got": "", "err": ""}
+_buf = io.StringIO()
+try:
+    with contextlib.redirect_stdout(_buf):
+        exec(_user_code, _ns)
+        exec(_test_code, _ns)
+    _out["got"] = repr(_ns.get("_result"))
+    _out["ok"] = True
+except Exception:
+    _out["err"] = traceback.format_exc(limit=1).strip().split("\\n")[-1]
+_out
+      `).toJs({dict_converter:Object.fromEntries});
+    }catch(err){ res={ok:false,err:String(err).split("\n").slice(-2).join(" "),got:""}; }
+    rows.push({t,res});
+  }
+  const passN=rows.filter(r=>r.res.ok && r.res.got===r.t.expected).length;
+  const allPass=passN===rows.length;
+  let html='<div class="r-head '+(allPass?"r-pass":"r-fail")+'">'+
+    (allPass?"\u2713 Practice passed \u2014 ":"\u2717 ")+passN+" / "+rows.length+" passing</div>";
+  rows.forEach(r=>{
+    const label="Case: "+r.t.code.replace(/\n/g," ; ");
+    if(r.res.ok && r.res.got===r.t.expected) html+='<div class="case ok">\u2713 '+esc(label)+' \u2192 '+esc(r.res.got)+'</div>';
+    else if(r.res.err) html+='<div class="case bad">\u2717 '+esc(label)+' \u2192 error: '+esc(r.res.err)+'</div>';
+    else html+='<div class="case bad">\u2717 '+esc(label)+' \u2192 expected '+esc(r.t.expected)+', got '+esc(r.res.got)+'</div>';
+  });
+  if(token!==refRenderToken) return;   // panel was re-rendered mid-run — drop stale results
+  out.innerHTML=html;
+  btn.disabled=false;
+}
+
 /* ================= TOOLBAR ================= */
+document.getElementById("refBtn").addEventListener("click",()=>{ editing=false; renderReference(); });
+
 document.getElementById("addBtn").addEventListener("click",()=>{
   const p={ __new:true, id:"custom-"+Date.now(), name:"Untitled problem", diff:"Medium",
     group:"My Problems", tags:[], prompt:"<p>Describe the problem here.</p>",
