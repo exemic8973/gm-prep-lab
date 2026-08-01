@@ -1796,7 +1796,7 @@ function renderTracker(){
 /* ================= SYSTEM DESIGN PANEL ================= */
 const DESIGN_KEY="coding-prep-design-v1";
 let designState={steps:{}};
-async function designSave(){ try{ await storage.set(DESIGN_KEY,JSON.stringify(designState)); }catch(e){} }
+async function designSave(){ try{ const r=await storage.set(DESIGN_KEY,JSON.stringify(designState)); if(!r) console.warn("Design progress failed to save."); }catch(e){ console.warn("Design progress failed to save."); } }
 async function designLoad(){ try{ const r=await storage.get(DESIGN_KEY); if(r&&r.value) designState=JSON.parse(r.value); }catch(e){} if(!designState.steps) designState.steps={}; }
 
 function designCard(d){
@@ -1841,7 +1841,7 @@ function renderDesign(){
 const BEHAV_KEY="coding-prep-behav-v1";
 let behavState={drafts:{},practiced:{}};
 let behavTimerId=null;
-async function behavSave(){ try{ await storage.set(BEHAV_KEY,JSON.stringify(behavState)); }catch(e){} }
+async function behavSave(){ try{ const r=await storage.set(BEHAV_KEY,JSON.stringify(behavState)); if(!r) console.warn("Behavioral drafts failed to save."); }catch(e){ console.warn("Behavioral drafts failed to save."); } }
 async function behavLoad(){ try{ const r=await storage.get(BEHAV_KEY); if(r&&r.value) behavState=JSON.parse(r.value); }catch(e){} if(!behavState.drafts) behavState.drafts={}; if(!behavState.practiced) behavState.practiced={}; }
 
 function behavCard(b){
