@@ -13,6 +13,7 @@
     --line:#DDE6EA; --charge:#0E8A5F; --charge-soft:#E2F3EC;
     --fail:#B4472F; --fail-soft:#FBE8E4; --warn:#E0A100; --warn-soft:#FBF3DC;
     --editor-bg:#12222C; --editor-ink:#DCE7EC;
+    --today:#E0A100; --today-soft:#FBF3DC; --danger:#B4472F; --radius:10px;
   }
   *{box-sizing:border-box;margin:0;padding:0}
   body{background:var(--bg);color:var(--ink);font-family:'IBM Plex Sans',sans-serif;-webkit-font-smoothing:antialiased}
@@ -94,6 +95,57 @@
   .rp-q code{font-family:'IBM Plex Mono',monospace;font-size:12px;background:#EEF3F5;padding:1px 5px;border-radius:4px}
   .rp-ed{min-height:120px !important;margin-top:0}
 
+  /* 28-day tracker */
+  .tracker-wrap{max-width:760px;margin:0 auto}
+  .battery-card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:16px;margin:16px 0}
+  .battery-row{display:flex;align-items:center;gap:14px}
+  .battery{flex:1;height:34px;border:2px solid var(--ink);border-radius:7px;position:relative;background:#fff;overflow:visible}
+  .battery::after{content:"";position:absolute;right:-7px;top:50%;transform:translateY(-50%);width:5px;height:14px;background:var(--ink);border-radius:0 3px 3px 0}
+  .battery-fill{position:absolute;inset:3px;width:0%;max-width:calc(100% - 6px);background:linear-gradient(90deg,#0E8A5F,#14A873);border-radius:3px;transition:width .5s ease}
+  .battery-pct{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:26px;min-width:78px;text-align:right;font-variant-numeric:tabular-nums}
+  .battery-meta{display:flex;justify-content:space-between;margin-top:10px;font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:var(--muted)}
+  .t-controls{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:14px 0 22px}
+  .t-controls label{font-size:13px;color:var(--muted);font-weight:500}
+  input[type=date]{font-family:'IBM Plex Mono',monospace;font-size:13px;padding:7px 10px;border:1px solid var(--line);border-radius:7px;background:var(--surface);color:var(--ink)}
+  .btn-today{border-color:var(--today);background:var(--today-soft)}
+  .btn-danger{color:var(--danger)}
+  .week{margin-bottom:26px}
+  .week-head{display:flex;align-items:baseline;justify-content:space-between;gap:10px;border-bottom:2px solid var(--ink);padding-bottom:6px;margin-bottom:10px}
+  .week-title{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:16px}
+  .week-title span{color:var(--muted);font-weight:500;font-size:13px;margin-left:8px}
+  .week-charge{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--charge);font-weight:500}
+  .day{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:12px 14px;margin-bottom:8px}
+  .day.today{border:2px solid var(--today);background:#FFFDF6}
+  .day.done{background:var(--charge-soft);border-color:#BFE3D3}
+  .day-head{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+  .day-num{font-family:'IBM Plex Mono',monospace;font-size:11.5px;font-weight:500;color:var(--muted);background:var(--bg);border:1px solid var(--line);border-radius:5px;padding:2px 7px;white-space:nowrap}
+  .day.today .day-num{background:var(--today);border-color:var(--today);color:#fff}
+  .day-date{font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:var(--muted)}
+  .today-tag{font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.1em;color:var(--today);font-weight:500;margin-left:auto}
+  .done-tag{font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.08em;color:var(--charge);font-weight:500;margin-left:auto}
+  .task{display:flex;align-items:flex-start;gap:10px;padding:5px 0;cursor:pointer;border-radius:6px}
+  .task:hover{background:rgba(20,35,46,.03)}
+  .task input{margin-top:3px;width:16px;height:16px;accent-color:var(--charge);cursor:pointer;flex-shrink:0}
+  .task .t-label{font-size:14px;line-height:1.45}
+  .task.checked .t-label{color:var(--muted);text-decoration:line-through;text-decoration-color:rgba(92,107,118,.5)}
+  .t-tag{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.06em;padding:1px 6px;border-radius:4px;margin-right:6px;vertical-align:1px;white-space:nowrap}
+  .tag-code{background:#E8EEF9;color:#2B5AA8}
+  .tag-design{background:#F3E9F7;color:#7A3E97}
+  .tag-story{background:#FCEEE3;color:#A85A1E}
+  .tag-domain{background:#E7F2EF;color:#0E7458}
+  .tag-sql{background:#EDEDF5;color:#4A4A80}
+  .tag-mock{background:#FBE8E4;color:#A83A24}
+  .tag-rest{background:#EEF2F4;color:#5C6B76}
+
+  /* design & behavioral panels */
+  .ref-intro{border-color:#BFE3D3;background:#F2FAF6}
+  .ref-list{margin:4px 0 4px;padding-left:18px;font-size:13.5px;line-height:1.6}
+  .ref-list li{margin-bottom:3px}
+  .chk-item{display:flex;align-items:flex-start;gap:8px;padding:4px 0;font-size:13.5px;cursor:pointer;line-height:1.45}
+  .chk-item input{margin-top:3px;width:15px;height:15px;accent-color:var(--charge);cursor:pointer;flex-shrink:0}
+  .chk-item.checked .chk-label{color:var(--muted);text-decoration:line-through}
+  .chk-label{flex:1}
+
   /* form */
   .form label{display:block;font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:12px 0 4px;font-weight:500}
   .form input[type=text], .form select, .form textarea{width:100%;font-family:'IBM Plex Sans',sans-serif;font-size:13.5px;padding:8px 10px;border:1px solid var(--line);border-radius:7px;background:#fff;color:var(--ink)}
@@ -148,6 +200,9 @@
   <div class="statusbar">
     <span class="solvedcount"><b id="solvedN">0</b> / <span id="totalN">0</span> solved</span>
     <button id="refBtn">&#128218; Reference</button>
+    <button id="trackerBtn">&#128197; 28-Day Plan</button>
+    <button id="designBtn">&#127961; Design</button>
+    <button id="behavBtn">&#127908; Behavioral</button>
     <button id="addBtn">+ New problem</button>
     <button id="exportBtn">Export</button>
     <button id="importBtn">Import</button>
@@ -804,6 +859,180 @@ const REFERENCE = [
  tests:[{code:`_result = factorial(5)`,expected:`120`},{code:`_result = factorial(0)`,expected:`1`}]}
 ];
 
+/* ================= 28-DAY TRACKER PLAN ================= */
+const TRACKER_PLAN = [
+  { title:"Week 1 — Foundation", days:[
+    ["Python refresher: dict, set, Counter, defaultdict, deque, heapq", ["code","Solve: Two Sum"], ["code","Solve: Group Anagrams"]],
+    ["Python refresher: sorted() with keys, slicing, comprehensions", ["code","Solve: Top K Frequent Elements"], ["code","Solve: Longest Consecutive Sequence"]],
+    [["code","Solve: Product of Array Except Self"], ["code","Solve: Valid Palindrome"], ["design","Memorize design framework steps 1\u20133 (requirements, capacity, API)"]],
+    [["code","Solve: Container With Most Water"], ["code","Solve: Longest Substring Without Repeating Chars"], ["design","Memorize framework steps 4\u20137 (data model, architecture, deep dives, reliability)"]],
+    [["code","Study: Minimum Window Substring (understand, don't grind)"], ["code","Solve: Best Time to Buy and Sell Stock"], ["sql","SQL: multi-table JOINs + GROUP BY/HAVING (5 problems)"]],
+    [["code","Solve: Merge Intervals"], ["code","Solve: Insert Interval"], ["sql","SQL: window functions \u2014 ROW_NUMBER, RANK, LAG (5 problems)"]],
+    [["code","Solve: Meeting Rooms II (min-heap)"], ["domain","Domain reading: V2H/V2G, EVSE, demand response (1 hr)"], ["design","Recite full design framework from memory, out loud"]]
+  ]},
+  { title:"Week 2 — Build", days:[
+    [["code","Solve: Valid Parentheses"], ["code","Solve: Daily Temperatures (monotonic stack)"], ["story","Write STAR stories 1\u20133 (Spring Boot API, Python tool, app consolidation)"]],
+    [["code","Solve: Implement Queue Using Stacks"], ["code","Solve: Reverse Linked List"], ["story","Write STAR stories 4\u20136 (SLA 40\u219295, IcM incident, MarTech migration)"]],
+    [["code","Solve: Merge Two Sorted Lists"], ["code","Solve: LRU Cache \u2014 first attempt, untimed"], ["story","Write STAR stories 7\u20139 (mentoring, conflict/influence, a failure)"]],
+    [["code","LRU Cache again \u2014 timed, target 15 min"], ["design","Design 1 aloud: EV/EVSE telemetry ingestion (45 min)"]],
+    [["code","Redo this week's missed problems"], ["domain","Study: Event Hubs/Kafka \u2014 partitions, consumer groups, DLQs, backpressure"]],
+    [["design","Design 2 aloud: home energy management API (45 min)"], ["domain","Domain reading: M&V, aggregators, virtual power plants"]],
+    [["rest","Light day: review notes only"], ["code","Redo one problem you failed this week"]]
+  ]},
+  { title:"Week 3 — Depth", days:[
+    [["code","Solve: Binary Tree Level Order Traversal (BFS)"], ["code","Solve: Validate BST"], ["story","Rehearse aloud: the Adobe-years objection answer"]],
+    [["code","Solve: Number of Islands"], ["code","Solve: Course Schedule (topological sort)"], ["story","Rehearse aloud: the Kafka/Databricks honesty answer"]],
+    [["code","Solve: Clone Graph"], ["design","Design 3 aloud: V2G dispatch / demand response (45 min)"]],
+    [["code","Code a token-bucket Rate Limiter from scratch"], ["story","Rehearse aloud: Warren relocation answer \u2014 final version"]],
+    [["code","Solve: Design HashMap"], ["code","Solve: Time-Based Key-Value Store (LC 981)"], ["design","Design 4 aloud: utility enrollment saga (45 min)"]],
+    [["code","Solve: Logger Rate Limiter"], ["design","Design 5 aloud: M&V reporting pipeline (45 min)"]],
+    [["mock","Mock behavioral round with Claude (all 9 stories + follow-ups)"], ["story","Rewrite your 2 weakest STAR stories"]]
+  ]},
+  { title:"Week 4 — Simulation", days:[
+    [["mock","Timed coding mock 1 with Claude \u2014 45 min, talk out loud"], ["code","Review and redo the mock problem clean"]],
+    [["mock","Full system design mock 1 with Claude \u2014 60 min, spoken + drawn"]],
+    [["mock","Timed coding mock 2 with Claude \u2014 45 min"], ["code","Redo any problem still failing"]],
+    [["mock","Full system design mock 2 with Claude \u2014 60 min"], ["design","Review: SLO/error budget + canary rollout talking points"]],
+    [["code","Cold + timed: LRU Cache and Time-Based KV Store back-to-back"], ["sql","SQL review: latest-reading-per-device + gap detection patterns"]],
+    [["story","Light review: framework one-pager, STAR list, 4 hard-question answers"], ["rest","Logistics: test Teams, webcam, mic, Excalidraw"]],
+    [["rest","Rest day: re-read JD once, resume once. No new material."], ["rest","Sleep early"]]
+  ]}
+];
+const TAG_LABEL = {code:"CODE", design:"DESIGN", story:"STORY", domain:"DOMAIN", sql:"SQL", mock:"MOCK", rest:"REST"};
+
+/* ================= SYSTEM DESIGN QUESTIONS ================= */
+/* Tailored to the GM Energy senior backend JD: telemetry, V2H/V2G, utilities, M&V. */
+const DESIGN_STEPS=[
+  "Requirements & constraints \u2014 clarify FIRST: scale, latency, consistency, consumers",
+  "Capacity estimates \u2014 orders of magnitude, directionally right",
+  "API design \u2014 endpoints, payloads, versioning, errors, auth",
+  "Data model & storage \u2014 relational vs time-series vs blob vs cache, chosen deliberately",
+  "High-level architecture \u2014 components + data flow, drawn out",
+  "Deep dives \u2014 pick 2\u20133 hotspots: scaling, ordering, failure modes",
+  "Reliability & ops \u2014 SLOs, monitoring, rollout & rollback, runbooks, incidents"
+];
+const DESIGN_PLAN = [
+{id:"telemetry-ingest",name:"EV/EVSE telemetry ingestion",tags:["distributed","streaming","iot"],
+ prompt:`Design the ingestion pipeline for telemetry from thousands of homes and vehicles \u2014 status pings, charge sessions, energy readings. The data feeds mobile apps, utility integrations, and M&V reporting.`,
+ clarify:[`What is the write volume and peak rate (vehicles \u00d7 ping frequency)?`,`Do we need per-device ordering of events?`,`Retention: hot window vs cold archive?`,`Who consumes \u2014 real-time APIs, dashboards, analytics warehouse?`],
+ shape:[`Gateway/ingest API validates + authenticates (device keys/certs) and returns fast`,`Event bus (Kafka/Event Hubs) partitioned by device_id \u2014 preserves per-device order`,`Stream processors: enrichment, normalization, dedupe / idempotency`,`Hot time-series store for recent reads; cold path to Snowflake/Databricks for analytics`,`DLQ + replay for bad events, backpressure at ingest, alert on lag`],
+ pitfalls:[`Out-of-order events \u2014 use per-device sequence numbers, not arrival time`,`9am charge-session burst \u2014 capacity-test the peak, not the average`,`Don\u2019t write to the warehouse from every API call \u2014 decouple via the bus`],
+ links:`See Reference: queue (FIFO), deque, hash map pattern \u00b7 tracker Week 2 domain: partitions, consumer groups, backpressure`},
+
+{id:"home-energy-api",name:"Home energy management API",tags:["rest","api design","caching"],
+ prompt:`Design the RESTful APIs that let customers view live energy, charge history, and program status in the mobile app. Read-heavy, multi-tenant, thousands of concurrent homes.`,
+ clarify:[`Read:write ratio and p95 latency targets?`,`Auth model \u2014 customer, device, or partner principals?`,`Acceptable freshness: live vs 5-minute stale?`,`Consumers beyond the mobile app \u2014 partner systems?`],
+ shape:[`API gateway + OAuth2, per-tenant scoping enforced end to end`,`Versioned contracts (/v1/\u2026), pagination, consistent error envelope`,`Service tier with cache-aside on hot read paths (device status, tariff)`,`Read models projected from the event bus for fast queries`,`Contract tests + a backward-compatibility policy`],
+ pitfalls:[`Tenant data leaks via bad joins \u2014 enforce tenant scope inside queries`,`N+1 queries on device lists \u2014 batch or parallelize`,`Cache stampede on a viral device \u2014 jitter TTLs, single-flight`],
+ links:`See Reference: hash map pattern, sliding window \u00b7 JD: versioned APIs, auth, robust error handling`},
+
+{id:"v2g-dispatch",name:"V2G / bidirectional charging dispatch",tags:["distributed","safety","state machine"],
+ prompt:`Design the service that dispatches charge/discharge commands to vehicles for V2H/V2G and demand response \u2014 commands must be delivered reliably, and every action auditable.`,
+ clarify:[`Delivery semantics \u2014 at-least-once? idempotent?`,`Safety/regulatory constraints on commands?`,`How many concurrent sessions?`,`What must be auditable, and for how long?`],
+ shape:[`Per-device state machine (idle \u2192 charging \u2192 discharging \u2192 fault) stored durably`,`Command queue per device; idempotency keys \u2014 a replayed command is a no-op`,`Delivery with ack + timeout/retry; escalation on no-ack`,`Append-only audit log of commands and outcomes`,`Failure story: revoke commands on outage; degraded mode disables discharge`],
+ pitfalls:[`Duplicate commands \u2014 idempotency keys are non-negotiable`,`State-machine races (two commands in flight) \u2014 serialize per device`,`What if the vehicle never acks? Design the timeout path explicitly`],
+ links:`See Reference: queue (FIFO), stack, monotonic stack \u00b7 JD: bidirectional charging (V2H/V2G) is the core domain`},
+
+{id:"utility-integration",name:"Utility enrollment & integration",tags:["integration","contracts","outbox"],
+ prompt:`Design the integrations with utilities and aggregators: enrollment flows, program events, and data exchange. Partner systems have varied APIs and reliability.`,
+ clarify:[`Sync or async exchange \u2014 webhooks vs batch?`,`Idempotency and retry expectations from partners?`,`PII / data-protection requirements?`,`Reconciliation needs \u2014 who owes whom what?`],
+ shape:[`Contract-first: versioned schemas + contract tests per partner`,`Outbox pattern \u2014 write events to the DB, publish to the bus, avoid dual-write`,`Webhook dispatcher with retries, backoff, and a DLQ per partner`,`Batch file exchange for large payloads (S3 + manifest + checksums)`,`Reconciliation job comparing our state vs partner\u2019s, alerting on drift`],
+ pitfalls:[`One slow partner blocking the queue \u2014 isolate per-partner queues`,`No reconciliation means silent data loss \u2014 always reconcile`,`Schema drift \u2014 version aggressively, deprecate slowly`],
+ links:`See Reference: interval merge, topological sort, in_degrees \u00b7 JD: utility/aggregator experiences`},
+
+{id:"mv-pipeline",name:"M&V reporting pipeline",tags:["data","streaming","warehouse"],
+ prompt:`Design the measurement & verification pipeline that turns telemetry into program performance reports for utilities \u2014 batch-friendly, trustworthy, and fresh.`,
+ clarify:[`Freshness SLO \u2014 daily, hourly, or near-real-time?`,`Report types and grain \u2014 per home, per program, per month?`,`Data quality expectations \u2014 what if readings are missing?`,`Consumers \u2014 analysts, utilities, regulators?`],
+ shape:[`Streaming \u2192 normalized event store`,`Aggregation layer (hourly/daily rollups) with late-data handling`,`Warehouse tables (Snowflake/Databricks) modeled for reporting`,`Data-quality checks: completeness, gaps, out-of-range \u2014 alert on anomalies`,`Lineage + rerun capability for corrected data`],
+ pitfalls:[`Late-arriving telemetry silently changing reports \u2014 watermark + alert`,`Duplicate readings double-counting \u2014 dedupe keys everywhere`,`No row-level lineage = untrustworthy reports`],
+ links:`See Reference: prefix sums, interval merge \u00b7 JD: M&V, data quality, freshness, observability`},
+
+{id:"rate-limiter",name:"Rate limiter for partner APIs",tags:["distributed","design","redis"],
+ prompt:`Design a rate limiter for partner and utility API clients \u2014 per-client limits, shared across instances, and it must not hurt availability.`,
+ clarify:[`Limits per client or per endpoint?`,`Distributed or single instance?`,`Excess requests: 429 or queue them?`,`Burst tolerance?`],
+ shape:[`Token bucket per client (capacity + refill rate)`,`Distributed counter in Redis via atomic Lua \u2014 never read-modify-write in app code`,`429 + Retry-After header; SDK guidance for clients`,`Enforce at the edge/gateway, not inside every service`],
+ pitfalls:[`Check-then-decrement races \u2014 one atomic script`,`The limiter itself as SPOF \u2014 Redis cluster + fail-open with alarm`,`In-memory-only limiter breaks the moment you scale out`],
+ links:`See the RateLimiter problem + token bucket solution \u00b7 Reference: heapq, hash map pattern`},
+
+{id:"hot-device-cache",name:"Hot device / read path scaling",tags:["caching","scalability"],
+ prompt:`A few popular devices and vehicles generate most reads \u2014 viral EVs, fleet customers. Design the read path so one hot tenant can\u2019t hurt everyone.`,
+ clarify:[`Which reads dominate \u2014 status or history?`,`Acceptable staleness for cached data?`,`Write amplification from hot devices?`,`SLOs under a 10\u00d7 traffic spike?`],
+ shape:[`Cache-aside with TTL + jitter for status reads`,`Single-flight / coalescing for cold-cache misses`,`Partition by tenant; isolate noisy neighbors (per-tenant limits or queues)`,`Read replicas for history; shard by device range`,`Load-test the burst; explicit capacity headroom policy`],
+ pitfalls:[`Cache stampede on TTL expiry \u2014 jitter + single-flight`,`One hot shard melting the cluster \u2014 rebalance or split`,`Stale cache serving the wrong tariff \u2014 version keys on schema change`],
+ links:`See the LRU Cache problem \u00b7 Reference: hash map pattern, heapq`},
+
+{id:"prod-readiness",name:"Production readiness & on-call",tags:["sre","reliability","incidents"],
+ prompt:`A new service is about to launch. What must be in place before it is production-ready at GM\u2019s reliability bar?`,
+ clarify:[`What is the SLO and error budget?`,`What are the known failure modes?`,`Who is on call and what can they do?`,`What is the rollback story for bad deploys?`],
+ shape:[`SLOs/SLIs with dashboards and alerts tuned to user impact`,`Health checks, readiness gates, graceful shutdown`,`Deploy strategy: blue/green or canary + instant rollback`,`Runbooks for the top failure modes; incident playbook`,`Post-incident review process that feeds permanent fixes`],
+ pitfalls:[`Alert on user impact, not symptoms`,`Never ship without a tested rollback path`,`SLO without an error budget is noise \u2014 the budget drives priorities`],
+ links:`JD: uptime, incident reduction, robust monitoring, production readiness reviews, runbooks`}
+];
+
+/* ================= BEHAVIORAL (STAR) QUESTIONS ================= */
+/* Level 7A lens: ownership, incidents, mentorship, influence, honest failures. */
+const BEHAV_PLAN = [
+{id:"tell-me",question:"Tell me about yourself.",tags:["opening"],
+ probe:`They want a 60\u201390 second narrative arc \u2014 present role, relevant past, why this role \u2014 not a resume readout.`,
+ structure:`Present: what you do now in one sentence. Past: 2\u20133 highlights that shaped you as a backend engineer (scale, reliability, ownership). Future: why GM Energy and this senior role. End on a handoff: \u201c\u2026which is why I\u2019m excited to talk about your telemetry platform.\u201d`,
+ hint:`Weave in one reliability or scale number \u2014 senior candidates show impact, not years.`},
+
+{id:"why-gm",question:"Why GM Energy, and why this senior role?",tags:["motivation","domain"],
+ probe:`Motivation and self-awareness: do you understand the domain (home energy, V2G, utilities) and what a senior IC actually does \u2014 mentorship, incidents, influence?`,
+ structure:`Domain pull: the energy transition / V2G scale problem genuinely interests you. Role pull: you want to lead complex work AND stay hands-on. Evidence: what you\u2019ve already read or built. Avoid salary-first or location-first answers.`,
+ hint:`Mirror the JD language: \u201cown critical production services\u201d, \u201coperate with minimal direction\u201d, \u201cmentor other engineers\u201d.`},
+
+{id:"incident",question:"Tell me about a production incident you diagnosed and resolved.",tags:["incident","on-call"],
+ probe:`Ownership and incident craft: triage under pressure, communication during the call, root cause, and what changed afterward \u2014 the permanent fix.`,
+ structure:`STAR: Situation (service, blast radius) \u2192 Task (your role on the call) \u2192 Action (triage, mitigation, root-cause analysis) \u2192 Result (metrics + post-incident follow-ups). The senior signal is driving the follow-ups, not just fixing it.`,
+ hint:`Your tracker plan lists your IcM incident story \u2014 use it.`},
+
+{id:"reliability",question:"Tell me about a time you improved reliability or uptime.",tags:["reliability","slo"],
+ probe:`Proactive reliability: did you find the problem, quantify it, fix it, and prove the outcome \u2014 with metrics?`,
+ structure:`Quantify before/after (e.g., SLA 40\u219295% \u2014 your story). Explain why it mattered to users or cost. Show process: SLOs, alerts, runbooks, automation \u2014 not heroics.`,
+ hint:`Use your SLA 40\u219295 story from the plan; name the error budget if you have one.`},
+
+{id:"conflict",question:"Tell me about a conflict with a teammate or another team.",tags:["conflict","communication"],
+ probe:`Emotional maturity: can you separate people from problems, listen, and find a path to agreement without escalation theater?`,
+ structure:`STAR with the \u201cI\u201d frame \u2014 what YOU did to de-escalate, what you learned about their constraints, the compromise and outcome, and the relationship after. Never villainize the other side.`,
+ hint:`Your MarTech migration or cross-team story fits.`},
+
+{id:"failure",question:"Tell me about a time you failed or made a mistake.",tags:["failure","honesty"],
+ probe:`Honesty and learning: do you own it without deflection, explain the real cause, and show what changed? A fake failure is worse than a real one.`,
+ structure:`Pick a real, bounded failure. Own it in the first sentence. Explain the systemic cause (not \u201cI was busy\u201d). Result: the concrete guardrail (process, test, check) that made it unrepeatable.`,
+ hint:`Same pattern works for resume gaps: own it, explain, show the change.`},
+
+{id:"mentor",question:"Tell me about a time you mentored another engineer.",tags:["mentorship","leadership"],
+ probe:`A Level 7A expectation: growing others. They want specifics \u2014 who, what skill, how you adapted, and the outcome for the person and the team.`,
+ structure:`Pick one person with a measurable arc (junior \u2192 independent). Show your approach: diagnosing the gap, teaching vs doing-for, feedback loops. Result: their growth + your team\u2019s capacity.`,
+ hint:`JD says \u201cmentor other engineers\u201d \u2014 prepare a technical variant and a career variant.`},
+
+{id:"influence",question:"Tell me about a time you influenced a decision without authority.",tags:["influence","cross-team"],
+ probe:`Influence across teams: persuasion with data, building allies, understanding stakeholders \u2014 not mandate.`,
+ structure:`STAR: the technical decision, your evidence (numbers or prototype), the stakeholders you aligned, the pushback you absorbed, the outcome, and how you kept the relationship.`,
+ hint:`Your cross-team consolidation story works \u2014 show the \u201cinfluence map\u201d (who you talked to, in what order).`},
+
+{id:"ambiguity",question:"Tell me about a project with unclear requirements.",tags:["ambiguity","ownership"],
+ probe:`Comfort with ambiguity: how did you define the problem, set scope, and keep stakeholders aligned without being told what to do?`,
+ structure:`Show: the questions you asked, the assumptions you made explicit, the minimal path to first value, and how you handled scope creep. Senior = you create clarity; you don\u2019t wait for it.`,
+ hint:`Relate it to turning a vague partner requirement into a service contract.`},
+
+{id:"priority",question:"Tell me about a time you juggled competing priorities.",tags:["prioritization","pressure"],
+ probe:`Judgment under pressure: how you triage, say no or defer, communicate trade-offs, and protect the critical path.`,
+ structure:`Name the competing demands, the criteria you used (impact/urgency/risk), what you deliberately deprioritized and who you told, and the outcome. Avoid \u201cI just worked harder.\u201d`,
+ hint:`On-call + feature work conflict is a classic senior scenario \u2014 a natural fit for your experience.`},
+
+{id:"pushback",question:"Tell me about a time you disagreed with a technical decision.",tags:["pushback","technical"],
+ probe:`Technical conviction + tact: can you push back with evidence, and accept being overruled gracefully?`,
+ structure:`The decision, why you disagreed (data/risk), how you raised it (privately, with alternatives), the outcome \u2014 and how you committed once the call was made. The strongest version includes one where you were wrong.`,
+ hint:`Prepare one story where you were right and one where you were wrong.`},
+
+{id:"gap",question:"Walk me through a gap in your background (energy domain, Kafka/Databricks, Azure).",tags:["honesty","growth"],
+ probe:`Honesty and growth mindset: do you acknowledge gaps confidently and show how you close them \u2014 instead of bluffing?`,
+ structure:`Own it plainly. Connect transferable strengths (distributed systems concepts, streaming patterns). Show action: what you\u2019ve learned or built to close the gap. End forward: how the role plays to your strengths while stretching you.`,
+ hint:`Your tracker plan lists the Kafka/Databricks honesty answer \u2014 rehearse it aloud.`}
+];
+
 /* ================= STATE ================= */
 const KEY = "gm-practice-lab-v2";
 /* localStorage-backed storage (drop-in replacement for the preview sandbox API) */
@@ -1454,8 +1683,223 @@ _out
   btn.disabled=false;
 }
 
+/* ================= 28-DAY TRACKER ================= */
+const TRACKER_KEY="coding-prep-tracker-v1";
+let trackerState={startDate:null,checked:{}};
+
+function tNorm(t){ return Array.isArray(t) ? {tag:t[0],label:t[1]} : {tag:"code",label:t}; }
+function tFmtDate(d){ return d.toLocaleDateString(undefined,{month:"short",day:"numeric"}); }
+function tDayDate(i){ if(!trackerState.startDate) return null; const d=new Date(trackerState.startDate+"T00:00:00"); d.setDate(d.getDate()+i); return d; }
+function tTodayIndex(){
+  if(!trackerState.startDate) return -1;
+  const s=new Date(trackerState.startDate+"T00:00:00");
+  const now=new Date();
+  // calendar-day arithmetic in UTC — immune to DST 23/25h days
+  const utcNow=Date.UTC(now.getFullYear(),now.getMonth(),now.getDate());
+  const utcStart=Date.UTC(s.getFullYear(),s.getMonth(),s.getDate());
+  return Math.round((utcNow-utcStart)/86400000);
+}
+async function trackerSave(){
+  const st=document.getElementById("tStatus");
+  try{ const r=await storage.set(TRACKER_KEY,JSON.stringify(trackerState)); if(st) st.textContent=r?"Saved \u2713":"Save failed \u2014 progress may not persist."; }
+  catch(e){ if(st) st.textContent="Save failed \u2014 progress may not persist."; }
+}
+async function trackerLoad(){
+  try{ const r=await storage.get(TRACKER_KEY); if(r&&r.value) trackerState=JSON.parse(r.value); }catch(e){}
+  if(!trackerState.startDate) trackerState.startDate=new Date().toISOString().slice(0,10);
+  if(!trackerState.checked || typeof trackerState.checked!=="object") trackerState.checked={};
+}
+
+function trackerRender(){
+  const weeksEl=document.getElementById("weeks");
+  weeksEl.innerHTML="";
+  let totalTasks=0, doneTasks=0;
+  const tIdx=tTodayIndex();
+  let dayCounter=0;
+  TRACKER_PLAN.forEach((week)=>{
+    let wTotal=0, wDone=0;
+    const sec=document.createElement("section"); sec.className="week";
+    const daysHtml=document.createElement("div");
+    week.days.forEach((tasks)=>{
+      const idx=dayCounter++;
+      const card=document.createElement("div");
+      const isToday=idx===tIdx;
+      let allDone=true;
+      const head=document.createElement("div"); head.className="day-head";
+      const d=tDayDate(idx);
+      head.innerHTML='<span class="day-num">DAY '+String(idx+1).padStart(2,"0")+'</span>'+(d?'<span class="day-date">'+tFmtDate(d)+'</span>':'');
+      card.appendChild(head);
+      tasks.forEach((t,ti)=>{
+        const {tag,label}=tNorm(t);
+        totalTasks++; wTotal++;
+        const id="d"+idx+"t"+ti;
+        const checked=!!trackerState.checked[id];
+        if(checked){ doneTasks++; wDone++; } else allDone=false;
+        const row=document.createElement("label");
+        row.className="task"+(checked?" checked":"");
+        row.innerHTML='<input type="checkbox" '+(checked?"checked":"")+'>'+
+          '<span class="t-label"><span class="t-tag tag-'+tag+'">'+TAG_LABEL[tag]+'</span>'+label+'</span>';
+        row.querySelector("input").addEventListener("change",ev=>{
+          if(ev.target.checked) trackerState.checked[id]=true; else delete trackerState.checked[id];
+          trackerSave(); trackerRender();
+        });
+        card.appendChild(row);
+      });
+      card.className="day"+(isToday?" today":"")+(allDone&&tasks.length?" done":"");
+      if(isToday){ head.insertAdjacentHTML("beforeend",'<span class="today-tag">&#9679; TODAY</span>'); card.id="todayCard"; }
+      else if(allDone){ head.insertAdjacentHTML("beforeend",'<span class="done-tag">CHARGED \u2713</span>'); }
+      daysHtml.appendChild(card);
+    });
+    const headEl=document.createElement("div"); headEl.className="week-head";
+    const wt=week.title.split("\u2014")[0].trim(), ws=week.title.split("\u2014")[1]?week.title.split("\u2014")[1].trim():"";
+    headEl.innerHTML='<div class="week-title">'+wt+(ws?'<span>'+ws+'</span>':'')+'</div>'+
+      '<div class="week-charge">'+wDone+'/'+wTotal+' &middot; '+Math.round(wTotal?wDone/wTotal*100:0)+'%</div>';
+    sec.appendChild(headEl); sec.appendChild(daysHtml);
+    weeksEl.appendChild(sec);
+  });
+  const pct=totalTasks?Math.round(doneTasks/totalTasks*100):0;
+  document.getElementById("fill").style.width=pct+"%";
+  document.getElementById("pct").textContent=pct+"%";
+  document.getElementById("taskCount").textContent=doneTasks+" / "+totalTasks+" tasks";
+  const info=document.getElementById("dayInfo");
+  if(tIdx<0) info.textContent="Starts "+tFmtDate(tDayDate(0));
+  else if(tIdx>27) info.textContent="Plan complete \u2014 interview mode";
+  else info.textContent="Day "+(tIdx+1)+" of 28 \u00b7 "+(27-tIdx)+" days left";
+  document.getElementById("startDate").value=trackerState.startDate;
+}
+
+function renderTracker(){
+  const panel=document.getElementById("panel");
+  panel.innerHTML=
+    '<div class="tracker-wrap">'+
+      '<div class="eyebrow">Coding Prep &middot; Sr Backend Engineer &middot; Level 7A</div>'+
+      '<div class="p-title">28-Day Interview Charge-Up</div>'+
+      '<div class="sub">Check off each task as you finish it. Progress saves automatically and will be here when you come back.</div>'+
+      '<div class="battery-card">'+
+        '<div class="battery-row"><div class="battery" aria-hidden="true"><div class="battery-fill" id="fill"></div></div><div class="battery-pct" id="pct">0%</div></div>'+
+        '<div class="battery-meta"><span id="taskCount">0 / 0 tasks</span><span id="dayInfo"></span></div>'+
+      '</div>'+
+      '<div class="t-controls">'+
+        '<label for="startDate">Start date</label><input type="date" id="startDate">'+
+        '<button class="btn-today" id="jumpToday">Jump to today</button>'+
+        '<button class="btn-danger" id="resetBtn">Reset all progress</button>'+
+      '</div>'+
+      '<div class="status" id="tStatus"></div>'+
+      '<div id="weeks"></div>'+
+    '</div>';
+  document.getElementById("startDate").addEventListener("change",e=>{ trackerState.startDate=e.target.value; trackerSave(); trackerRender(); });
+  document.getElementById("jumpToday").addEventListener("click",()=>{ const el=document.getElementById("todayCard"); if(el) el.scrollIntoView({behavior:"smooth",block:"center"}); });
+  document.getElementById("resetBtn").addEventListener("click",async()=>{ if(!confirm("Clear all checked tasks? This cannot be undone.")) return; trackerState.checked={}; await trackerSave(); trackerRender(); });
+  trackerLoad().then(trackerRender);
+}
+
+/* ================= SYSTEM DESIGN PANEL ================= */
+const DESIGN_KEY="coding-prep-design-v1";
+let designState={steps:{}};
+async function designSave(){ try{ await storage.set(DESIGN_KEY,JSON.stringify(designState)); }catch(e){} }
+async function designLoad(){ try{ const r=await storage.get(DESIGN_KEY); if(r&&r.value) designState=JSON.parse(r.value); }catch(e){} if(!designState.steps) designState.steps={}; }
+
+function designCard(d){
+  const st=designState.steps[d.id]||[];
+  return '<div class="ref-card">'+
+    '<div class="ref-name">'+esc(d.name)+(d.tags||[]).map(t=>'<span class="p-tag">'+esc(t)+'</span>').join("")+'</div>'+
+    '<div class="ref-row"><b>Prompt</b> '+sanitizeHtml(d.prompt)+'</div>'+
+    '<div class="ref-row"><b>Clarify</b><ul class="ref-list">'+d.clarify.map(c=>'<li>'+sanitizeHtml(c)+'</li>').join("")+'</ul></div>'+
+    '<div class="ref-row"><b>Shape</b><ul class="ref-list">'+d.shape.map(s=>'<li>'+sanitizeHtml(s)+'</li>').join("")+'</ul></div>'+
+    '<div class="ref-row"><b>Watch</b><ul class="ref-list">'+d.pitfalls.map(p=>'<li>'+sanitizeHtml(p)+'</li>').join("")+'</ul></div>'+
+    (d.links?'<div class="cx">'+esc(d.links)+'</div>':'')+
+    '<div class="ref-practice"><div class="rp-q">Practice: walk through it aloud \u2014 use the 45-min timer in the toolbar. Tick each step as you cover it.</div>'+
+      '<div id="ds-'+d.id+'">'+DESIGN_STEPS.map((s,i)=>
+        '<label class="chk-item'+(st[i]?' checked':'')+'" data-q="'+d.id+'" data-s="'+i+'">'+
+        '<input type="checkbox"'+(st[i]?' checked':'')+'><span class="chk-label">'+(i+1)+' \u00b7 '+s+'</span></label>').join("")+
+      '</div></div>'+
+  '</div>';
+}
+
+function renderDesign(){
+  const panel=document.getElementById("panel");
+  let html='<div class="ref-card ref-intro">'+
+    '<div class="ref-name">System design \u2014 first-timer\u2019s guide</div>'+
+    '<div class="ref-row">A 45\u201360 minute conversation, not a quiz. There is no right answer; interviewers score how you decompose a vague problem, make trade-offs, and drive the discussion. At senior level they also watch for <i>reliability reflexes</i>: you mention SLOs, rollback, monitoring, and on-call unprompted.</div>'+
+    '<div class="ref-row">Work the 7-step framework below <i>out loud</i>, state your assumptions, and timebox: ~8 min clarifying, ~5 min capacity, ~8 min API, ~10 min data model, ~15 min architecture + deep dives, ~5 min reliability. Stuck? Say so and move on \u2014 coverage beats perfection.</div>'+
+    '<div class="ref-row">The 8 questions below are tailored to the GM Energy domain \u2014 telemetry, V2H/V2G, utilities, M&V. Do each one aloud with the 45-min timer and tick the steps as you go.</div>'+
+  '</div>';
+  DESIGN_PLAN.forEach(d=>{ html+=designCard(d); });
+  panel.innerHTML=html;
+  panel.querySelectorAll(".chk-item input").forEach(inp=>{
+    inp.addEventListener("change",()=>{
+      const item=inp.closest(".chk-item"), q=item.dataset.q, s=+item.dataset.s;
+      if(!designState.steps[q]) designState.steps[q]=[];
+      designState.steps[q][s]=inp.checked?1:0;
+      item.classList.toggle("checked",inp.checked);
+      designSave();
+    });
+  });
+}
+
+/* ================= BEHAVIORAL PANEL ================= */
+const BEHAV_KEY="coding-prep-behav-v1";
+let behavState={drafts:{},practiced:{}};
+let behavTimerId=null;
+async function behavSave(){ try{ await storage.set(BEHAV_KEY,JSON.stringify(behavState)); }catch(e){} }
+async function behavLoad(){ try{ const r=await storage.get(BEHAV_KEY); if(r&&r.value) behavState=JSON.parse(r.value); }catch(e){} if(!behavState.drafts) behavState.drafts={}; if(!behavState.practiced) behavState.practiced={}; }
+
+function behavCard(b){
+  const draft=behavState.drafts[b.id]||"";
+  return '<div class="ref-card">'+
+    '<div class="ref-name">'+esc(b.question)+(b.tags||[]).map(t=>'<span class="p-tag">'+esc(t)+'</span>').join("")+'</div>'+
+    '<div class="ref-row"><b>Probe</b> '+sanitizeHtml(b.probe)+'</div>'+
+    '<div class="ref-row"><b>Frame</b> '+sanitizeHtml(b.structure)+'</div>'+
+    (b.hint?'<div class="ref-row"><b>Hint</b> '+sanitizeHtml(b.hint)+'</div>':'')+
+    '<div class="ref-practice">'+
+      '<div class="rp-q">Practice: draft your STAR story here (saves automatically), then speak it aloud \u2014 2 minutes. Aim for ~90 seconds.</div>'+
+      '<textarea class="editor rp-ed" id="bd-'+b.id+'" spellcheck="false" placeholder="Situation / Task / Action / Result\u2026">'+esc(draft)+'</textarea>'+
+      '<div class="actions"><button class="btn-run" id="bp-'+b.id+'">Start 2-min timer</button>'+
+      '<label class="chk-item" style="padding:6px 0 0"><input type="checkbox" id="bpd-'+b.id+'"'+(behavState.practiced[b.id]?' checked':'')+'><span class="chk-label">Practiced aloud</span></label></div>'+
+    '</div>'+
+  '</div>';
+}
+
+function startBehavTimer(id){
+  const btn=document.getElementById("bp-"+id);
+  if(!btn) return;
+  if(behavTimerId){ clearInterval(behavTimerId); behavTimerId=null; }
+  let s=120;
+  const paint=()=>{ const m=Math.floor(s/60),ss=s%60; btn.textContent=m+":"+String(ss).padStart(2,"0")+" \u2014 speaking\u2026"; };
+  paint();
+  behavTimerId=setInterval(()=>{
+    s--;
+    if(s<=0){ clearInterval(behavTimerId); behavTimerId=null; btn.textContent="\u23F1 Time\u2019s up \u2014 how did it go?"; return; }
+    paint();
+  },1000);
+}
+
+function renderBehav(){
+  const panel=document.getElementById("panel");
+  let html='<div class="ref-card ref-intro">'+
+    '<div class="ref-name">Behavioral \u2014 first-timer\u2019s guide</div>'+
+    '<div class="ref-row"><b>STAR</b> is scored like code: structure, signal, evidence. <b>Situation</b> (context + stakes) \u2192 <b>Task</b> (your specific role) \u2192 <b>Action</b> (what <i>you</i> did \u2014 say \u201cI\u201d, not \u201cwe\u201d) \u2192 <b>Result</b> (metrics + what changed). Always close with reflection: what you\u2019d do differently.</div>'+
+    '<div class="ref-row"><b>Senior signals</b> interviewers listen for: ownership beyond your ticket, incidents and on-call, mentorship, influencing across teams, honest failures with systemic fixes. Keep stories to ~90 seconds; lead with the result when it\u2019s strong.</div>'+
+    '<div class="ref-row">Prepare 6\u20138 stories covering: incident, reliability win, conflict, failure, mentorship, influence. Draft them in the boxes below, then practice speaking each aloud until it hits 90 seconds.</div>'+
+  '</div>';
+  BEHAV_PLAN.forEach(b=>{ html+=behavCard(b); });
+  panel.innerHTML=html;
+  panel.querySelectorAll('textarea[id^="bd-"]').forEach(ta=>{
+    ta.addEventListener("input",()=>{ behavState.drafts[ta.id.slice(3)]=ta.value; behavSave(); });
+  });
+  panel.querySelectorAll('input[id^="bpd-"]').forEach(inp=>{
+    inp.addEventListener("change",()=>{ behavState.practiced[inp.id.slice(4)]=inp.checked?1:0; behavSave(); });
+  });
+  panel.querySelectorAll('button[id^="bp-"]').forEach(btn=>{
+    btn.addEventListener("click",()=>startBehavTimer(btn.id.slice(3)));
+  });
+}
+
 /* ================= TOOLBAR ================= */
 document.getElementById("refBtn").addEventListener("click",()=>{ editing=false; renderReference(); });
+document.getElementById("trackerBtn").addEventListener("click",()=>{ editing=false; renderTracker(); });
+document.getElementById("designBtn").addEventListener("click",()=>{ editing=false; designLoad().then(renderDesign); });
+document.getElementById("behavBtn").addEventListener("click",()=>{ editing=false; behavLoad().then(renderBehav); });
 
 document.getElementById("addBtn").addEventListener("click",()=>{
   const p={ __new:true, id:"custom-"+Date.now(), name:"Untitled problem", diff:"Medium",
