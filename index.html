@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>GM Energy Prep — Coding Practice Lab</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -799,15 +800,25 @@ async function ensurePyodide(){
   if(typeof WebAssembly==="undefined"){ throw new Error("nowasm"); }
   pyLoading=true;
   setStatus("Loading Python engine (first run only, ~10s)\u2026");
+  // Order matters: jsdelivr verified working; gcore is its China mirror.
   const CDNS=[
-    "https://cdnjs.cloudflare.com/ajax/libs/pyodide/0.26.2/",
     "https://cdn.jsdelivr.net/pyodide/v0.26.2/full/",
+    "https://gcore.jsdelivr.net/pyodide/v0.26.2/full/",
     "https://unpkg.com/pyodide@0.26.2/",
-    "https://gcore.jsdelivr.net/pyodide/v0.26.2/full/"
+    "https://cdnjs.cloudflare.com/ajax/libs/pyodide/0.26.2/"
   ];
+  // Pre-flight: some CDNs serve pyodide.js but block the stdlib zip with CORS,
+  // which would fail the whole load — skip any mirror that can't serve it.
+  async function cdnOk(base){
+    try{
+      const r=await fetch(base+"python_stdlib.zip",{method:"HEAD",mode:"cors"});
+      return r.ok;
+    }catch(e){ return false; }
+  }
   let lastErr=null;
   for(const base of CDNS){
     try{
+      if(!(await cdnOk(base))){ continue; }
       if(typeof loadPyodide==="undefined"){
         await new Promise((res,rej)=>{
           const s=document.createElement("script");
