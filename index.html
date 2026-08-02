@@ -145,6 +145,11 @@
   .chk-item input{margin-top:3px;width:15px;height:15px;accent-color:var(--charge);cursor:pointer;flex-shrink:0}
   .chk-item.checked .chk-label{color:var(--muted);text-decoration:line-through}
   .chk-label{flex:1}
+  .ref-link{font-family:'IBM Plex Mono',monospace;font-size:10.5px;padding:2px 8px;border:1px solid var(--line);border-radius:12px;background:#fff;color:var(--charge);cursor:pointer;margin:0 4px 4px 0}
+  .ref-link:hover{border-color:var(--charge);background:var(--charge-soft)}
+  .ref-used{font-size:12.5px;color:var(--muted);margin:8px 0 2px}
+  .tools-row{margin-bottom:10px;font-size:12.5px;color:var(--muted)}
+  .tools-row b{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--charge);margin-right:6px}
 
   /* form */
   .form label{display:block;font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:12px 0 4px;font-weight:500}
@@ -859,6 +864,194 @@ const REFERENCE = [
  tests:[{code:`_result = factorial(5)`,expected:`120`},{code:`_result = factorial(0)`,expected:`1`}]}
 ];
 
+/* ================= REFERENCE SOLUTIONS & PROBLEM LINKS ================= */
+const REF_SOLUTIONS = {
+"enumerate":{code:`def zero_indices(nums):
+    return [i for i, x in enumerate(nums) if x == 0]`,explain:`enumerate() yields (index, value) pairs, so the comprehension collects i wherever x is 0. O(n).`},
+"dict-get":{code:`def char_counts(s):
+    counts = {}
+    for ch in s:
+        counts[ch] = counts.get(ch, 0) + 1
+    return counts`,explain:`The .get(ch, 0) read is the whole trick \u2014 no KeyError, no if/else guard. O(n).`},
+"counter":{code:`from collections import Counter
+
+def most_common_char(s):
+    return Counter(s).most_common(1)[0][0]`,explain:`most_common(1) returns [(char, count)]; [0][0] unpacks the character.`},
+"defaultdict":{code:`from collections import defaultdict
+
+def group_by_first(strs):
+    groups = defaultdict(list)
+    for w in strs:
+        groups[w[0]].append(w)
+    return dict(groups)`,explain:`defaultdict(list) creates the list on first touch. Return dict(groups) \u2014 the expected repr is a plain dict, and a defaultdict\u2019s repr includes the factory.`},
+"unpacking":{code:`def sum_pairs(pairs):
+    return [a + b for a, b in pairs]`,explain:`The loop header unpacks each pair into a and b \u2014 no indexing needed.`},
+"sorted-key":{code:`def sort_by_second(pairs):
+    return sorted(pairs, key=lambda p: p[1])`,explain:`key=lambda p: p[1] sorts by the second element without changing the elements themselves.`},
+"comprehension":{code:`def squares_of_evens(nums):
+    return [x ** 2 for x in nums if x % 2 == 0]`,explain:`Filter with if, transform with the expression \u2014 [expr for x in items if cond].`},
+"set":{code:`def unique_count(nums):
+    return len(set(nums))`,explain:`set() dedupes in O(n); len() counts.`},
+"slicing":{code:`def is_palindrome(s):
+    return s == s[::-1]`,explain:`s[::-1] is the whole string reversed \u2014 equality with the original is the entire test.`},
+"deque":{code:`from collections import deque
+
+def fifo_order(n):
+    q = deque(range(n))
+    out = []
+    while q:
+        out.append(q.popleft())
+    return out`,explain:`popleft() is O(1) on a deque; list.pop(0) would be O(n) per element.`},
+"heapq":{code:`import heapq
+
+def k_smallest(nums, k):
+    return heapq.nsmallest(k, nums)`,explain:`nsmallest is O(n log k) \u2014 cheaper than a full sort when k is small.`},
+"bisect":{code:`from bisect import bisect_right
+
+def count_leq(sorted_nums, x):
+    return bisect_right(sorted_nums, x)`,explain:`bisect_right returns the insertion point after all copies of x \u2014 which is exactly the count of elements <= x. O(log n).`},
+"ordereddict":{code:`from collections import OrderedDict
+
+def touch(od, key):
+    od.move_to_end(key)
+    return list(od)`,explain:`move_to_end marks the key as most recently used; list(od) shows the resulting order.`},
+"hash-map-pattern":{code:`def has_pair_sum(nums, target):
+    seen = set()
+    for num in nums:
+        if target - num in seen:
+            return True
+        seen.add(num)
+    return False`,explain:`One pass: check the complement before storing the current number. A set suffices when only existence matters \u2014 a dict if you need the index. O(n).`},
+"stack":{code:`def balanced_parens(s):
+    stack = []
+    for ch in s:
+        if ch == "(":
+            stack.append(ch)
+        elif ch == ")":
+            if not stack:
+                return False
+            stack.pop()
+    return not stack`,explain:`Push openers, pop on closers. The empty-stack pop is the edge case, and leftover openers fail at the end.`},
+"queue":{code:`from collections import deque
+
+def bfs_reach(graph, start):
+    seen = {start}
+    q = deque([start])
+    order = []
+    while q:
+        node = q.popleft()
+        order.append(node)
+        for nxt in graph.get(node, []):
+            if nxt not in seen:
+                seen.add(nxt)
+                q.append(nxt)
+    return order`,explain:`Mark visited when enqueuing, not when popping \u2014 otherwise nodes enter the queue twice. graph.get(node, []) handles missing keys.`},
+"linked-list":{code:`def count_nodes(head):
+    count = 0
+    while head:
+        count += 1
+        head = head.next
+    return count`,explain:`Walk .next until None. O(n) time, O(1) space.`},
+"graph-adjacency":{code:`def neighbors(graph, node):
+    return sorted(graph.get(node, []))`,explain:`.get(node, []) avoids a KeyError for isolated nodes; sorted() makes the result deterministic.`},
+"two-pointers":{code:`def pair_sum_sorted(sorted_nums, target):
+    left, right = 0, len(sorted_nums) - 1
+    while left < right:
+        s = sorted_nums[left] + sorted_nums[right]
+        if s == target:
+            return [left, right]
+        if s < target:
+            left += 1
+        else:
+            right -= 1
+    return []`,explain:`Sorted input means the sum tells you which pointer to move: too small \u2192 advance left, too big \u2192 retreat right. O(n).`},
+"sliding-window":{code:`def max_sum_k(nums, k):
+    if k <= 0 or k > len(nums):
+        return 0
+    window = sum(nums[:k])
+    best = window
+    for right in range(k, len(nums)):
+        window += nums[right] - nums[right - k]
+        best = max(best, window)
+    return best`,explain:`Slide one position at a time: add the new element, subtract the one leaving the window. O(n) instead of O(n\u00b7k).`},
+"monotonic-stack":{code:`def next_greater(nums):
+    result = [-1] * len(nums)
+    stack = []
+    for i, num in enumerate(nums):
+        while stack and nums[stack[-1]] < num:
+            result[stack.pop()] = num
+        stack.append(i)
+    return result`,explain:`The stack holds unresolved indexes in decreasing order. Each index is pushed and popped once \u2014 amortized O(n).`},
+"prefix-sums":{code:`def running_sum(nums):
+    prefix = []
+    total = 0
+    for x in nums:
+        total += x
+        prefix.append(total)
+    return prefix`,explain:`One pass accumulates; prefix[i] answers "sum up to i" in O(1) later.`},
+"interval-merge":{code:`def overlaps(a, b):
+    return a[0] <= b[1] and b[0] <= a[1]`,explain:`Two intervals overlap iff each starts before the other ends. <= means touching counts \u2014 confirm the boundary with the interviewer.`},
+"binary-search":{code:`def first_ge(sorted_nums, x):
+    lo, hi = 0, len(sorted_nums)
+    while lo < hi:
+        mid = (lo + hi) // 2
+        if sorted_nums[mid] < x:
+            lo = mid + 1
+        else:
+            hi = mid
+    return lo`,explain:`The lower-bound variant: hi only ever points at a valid answer, so lo converges to the first index >= x. O(log n).`},
+"bfs-dfs":{code:`from collections import deque
+
+def reachable_count(graph, start):
+    seen = {start}
+    q = deque([start])
+    while q:
+        node = q.popleft()
+        for nxt in graph.get(node, []):
+            if nxt not in seen:
+                seen.add(nxt)
+                q.append(nxt)
+    return len(seen)`,explain:`BFS explores by distance; the visited set both prevents cycles and supplies the answer \u2014 len(seen).`},
+"topo-sort":{code:`def in_degrees(n, edges):
+    degree = [0] * n
+    for course, prereq in edges:
+        degree[course] += 1
+    return degree`,explain:`Each edge [course, prereq] points INTO course, so course\u2019s in-degree rises by 1. This is the setup step of Kahn\u2019s algorithm.`},
+"recursion":{code:`def factorial(n):
+    return 1 if n <= 1 else n * factorial(n - 1)`,explain:`Base case (n <= 1) stops the recursion; every call shrinks n, so it always terminates.`}
+};
+
+/* ref entry id -> coding problems that use it (reverse links are derived) */
+const REF_LINKS = {
+  "enumerate": ["two-sum","daily-temps","longest-substring"],
+  "dict-get": ["two-sum","time-map"],
+  "counter": ["top-k-frequent","group-anagrams"],
+  "defaultdict": ["group-anagrams","course-schedule","time-map"],
+  "unpacking": ["merge-intervals","insert-interval","meeting-rooms"],
+  "sorted-key": ["group-anagrams","merge-intervals"],
+  "comprehension": ["top-k-frequent","course-schedule"],
+  "set": ["longest-consecutive"],
+  "slicing": ["longest-substring"],
+  "deque": ["num-islands","course-schedule"],
+  "heapq": ["top-k-frequent","meeting-rooms"],
+  "bisect": ["time-map"],
+  "ordereddict": ["lru-cache"],
+  "hash-map-pattern": ["two-sum","lru-cache"],
+  "stack": ["valid-parens","daily-temps"],
+  "queue": ["num-islands","course-schedule"],
+  "linked-list": ["lru-cache"],
+  "graph-adjacency": ["course-schedule","num-islands"],
+  "two-pointers": ["container-water","longest-substring"],
+  "sliding-window": ["longest-substring"],
+  "monotonic-stack": ["daily-temps"],
+  "prefix-sums": ["product-except-self"],
+  "interval-merge": ["merge-intervals","insert-interval","meeting-rooms"],
+  "binary-search": ["time-map"],
+  "bfs-dfs": ["num-islands","course-schedule"],
+  "topo-sort": ["course-schedule"],
+  "recursion": ["num-islands"]
+};
+
 /* ================= 28-DAY TRACKER PLAN ================= */
 const TRACKER_PLAN = [
   { title:"Week 1 — Foundation", days:[
@@ -1127,12 +1320,17 @@ function renderPanel(){
   if(!p){ panel.innerHTML='<div class="prompt">No problem selected. Pick one from the list, or create a new one.</div>'; return; }
   if(editing){ renderForm(p); return; }
   const saved = state.code[p.id]!==undefined ? state.code[p.id] : p.starter;
+  const tools = REFERENCE.filter(r=>(REF_LINKS[r.id]||[]).includes(p.id));
+  const toolsHtml = tools.length
+    ? '<div class="tools-row"><b>Tools</b>'+tools.map(r=>'<button class="ref-link" data-ref="'+r.id+'" data-refname="'+esc(r.name)+'">'+esc(r.name)+'</button>').join("")+'</div>'
+    : "";
   panel.innerHTML=
     '<div class="p-title">'+esc(p.name)+'</div>'+
     '<div class="p-meta"><span class="diff d-'+esc(p.diff)+'">'+esc(p.diff).toUpperCase()+'</span>'+
       (p.tags||[]).map(t=>'<span class="p-tag">'+esc(t)+'</span>').join("")+
       (state.solved[p.id]?'<span class="p-tag" style="background:var(--charge-soft);color:#0B6B48">SOLVED \u2713</span>':'')+
     '</div>'+
+    toolsHtml+
     '<div class="prompt">'+sanitizeHtml(p.prompt)+'</div>'+
     '<div class="ex">'+esc(p.ex)+'</div>'+
     '<textarea class="editor" id="editor" spellcheck="false"></textarea>'+
@@ -1170,6 +1368,9 @@ function renderPanel(){
     delete state.code[p.id]; save(); renderPanel();
   });
   document.getElementById("editBtn").addEventListener("click",()=>{ editing=true; renderPanel(); });
+  panel.querySelectorAll(".tools-row .ref-link").forEach(btn=>{
+    btn.addEventListener("click",()=>{ refQuery=btn.dataset.refname; renderReference(); });
+  });
   document.getElementById("traceMine").addEventListener("click",()=>startTrace(p, document.getElementById("editor").value, "your code"));
   const ts=document.getElementById("traceSol");
   if(ts) ts.addEventListener("click",()=>startTrace(p, p.solution, "the solution"));
@@ -1580,7 +1781,11 @@ function trStop(){ if(TR.playing){ clearInterval(TR.playing); TR.playing=null; }
 let refQuery = "";
 let refRenderToken = 0;   // bumped on every re-render; guards stale async writes
 
+function openProblem(pid){ current=pid; editing=false; refQuery=""; renderList(); renderPanel(); }
+
 function refCard(e){
+  const probs=(REF_LINKS[e.id]||[]).map(pid=>{ const p=byId(pid); return p?'<button class="ref-link" data-pid="'+pid+'">'+esc(p.name)+'</button>':""; }).join("");
+  const sol=REF_SOLUTIONS[e.id];
   return '<div class="ref-card">'+
     '<div class="ref-name">'+esc(e.name)+
       (e.tags||[]).map(t=>'<span class="p-tag">'+esc(t)+'</span>').join("")+'</div>'+
@@ -1588,11 +1793,13 @@ function refCard(e){
     '<div class="ref-row"><b>When</b> '+sanitizeHtml(e.when)+'</div>'+
     '<div class="ref-row"><b>How</b> '+sanitizeHtml(e.how)+'</div>'+
     '<div class="ex">'+esc(e.ex)+'</div>'+
+    (probs?'<div class="ref-used">Used in: '+probs+'</div>':'')+
     '<div class="ref-practice">'+
       '<div class="rp-q">Quick practice: '+sanitizeHtml(e.practice)+'</div>'+
       '<textarea class="editor rp-ed" id="rp-ed-'+e.id+'" spellcheck="false">'+esc(e.starter)+'</textarea>'+
       '<div class="actions"><button class="btn-run" id="rp-'+e.id+'">Run practice</button></div>'+
       '<div class="results" id="rp-res-'+e.id+'"></div>'+
+      (sol?'<details><summary>Show solution &amp; explanation</summary><div class="body"><pre>'+esc(sol.code)+'</pre>'+esc(sol.explain||"")+'</div></details>':'')+
     '</div>'+
   '</div>';
 }
@@ -1632,6 +1839,9 @@ function renderReference(){
   REFERENCE.forEach(e=>{
     const btn=document.getElementById("rp-"+e.id);
     if(btn) btn.addEventListener("click",()=>runPracticeCard(e));
+  });
+  panel.querySelectorAll(".ref-link").forEach(btn=>{
+    btn.addEventListener("click",()=>openProblem(btn.dataset.pid));
   });
 }
 
