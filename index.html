@@ -150,6 +150,8 @@
   .ref-used{font-size:12.5px;color:var(--muted);margin:8px 0 2px}
   .tools-row{margin-bottom:10px;font-size:12.5px;color:var(--muted)}
   .tools-row b{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--charge);margin-right:6px}
+  .sol-label{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:8px 0 3px}
+  .sol-label:first-child{margin-top:0}
 
   /* form */
   .form label{display:block;font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:12px 0 4px;font-weight:500}
@@ -1021,6 +1023,198 @@ def reachable_count(graph, start):
     return 1 if n <= 1 else n * factorial(n - 1)`,explain:`Base case (n <= 1) stops the recursion; every call shrinks n, so it always terminates.`}
 };
 
+/* Traditional (explicit / classic) variants for every reference solution.
+   codeLabel/tradLabel override the default "Idiomatic" / "Traditional" labels. */
+const REF_TRAD = {
+"enumerate":{trad:`def zero_indices(nums):
+    result = []
+    for i, num in enumerate(nums):
+        if num == 0:
+            result.append(i)
+    return result`},
+"dict-get":{trad:`def char_counts(s):
+    counts = {}
+    for ch in s:
+        if ch in counts:
+            counts[ch] += 1
+        else:
+            counts[ch] = 1
+    return counts`},
+"counter":{trad:`def most_common_char(s):
+    counts = {}
+    for ch in s:
+        if ch not in counts:
+            counts[ch] = 0
+        counts[ch] += 1
+    best_char, best_count = None, -1
+    for ch, count in counts.items():
+        if count > best_count:
+            best_char, best_count = ch, count
+    return best_char`},
+"defaultdict":{trad:`def group_by_first(strs):
+    groups = {}
+    for w in strs:
+        first = w[0]
+        if first not in groups:
+            groups[first] = []
+        groups[first].append(w)
+    return groups`},
+"unpacking":{trad:`def sum_pairs(pairs):
+    result = []
+    for pair in pairs:
+        result.append(pair[0] + pair[1])
+    return result`},
+"sorted-key":{trad:`def sort_by_second(pairs):
+    result = pairs[:]
+    for i in range(len(result)):
+        smallest = i
+        for j in range(i + 1, len(result)):
+            if result[j][1] < result[smallest][1]:
+                smallest = j
+        result[i], result[smallest] = result[smallest], result[i]
+    return result`},
+"comprehension":{trad:`def squares_of_evens(nums):
+    result = []
+    for x in nums:
+        if x % 2 == 0:
+            result.append(x ** 2)
+    return result`},
+"set":{trad:`def unique_count(nums):
+    result = []
+    for x in nums:
+        if x not in result:
+            result.append(x)
+    return len(result)`},
+"slicing":{trad:`def is_palindrome(s):
+    left, right = 0, len(s) - 1
+    while left < right:
+        if s[left] != s[right]:
+            return False
+        left += 1
+        right -= 1
+    return True`},
+"deque":{trad:`def fifo_order(n):
+    q = list(range(n))
+    out = []
+    while q:
+        out.append(q.pop(0))
+    return out`},
+"heapq":{trad:`def k_smallest(nums, k):
+    return sorted(nums)[:k]`},
+"bisect":{trad:`def count_leq(sorted_nums, x):
+    count = 0
+    for num in sorted_nums:
+        if num > x:
+            break
+        count += 1
+    return count`},
+"ordereddict":{trad:`def touch(od, key):
+    value = od[key]
+    del od[key]
+    od[key] = value
+    return list(od)`},
+"hash-map-pattern":{trad:`def has_pair_sum(nums, target):
+    for i in range(len(nums)):
+        for j in range(i + 1, len(nums)):
+            if nums[i] + nums[j] == target:
+                return True
+    return False`},
+"stack":{codeLabel:"Stack",trad:`def balanced_parens(s):
+    depth = 0
+    for ch in s:
+        if ch == "(":
+            depth += 1
+        elif ch == ")":
+            depth -= 1
+            if depth < 0:
+                return False
+    return depth == 0`,tradLabel:"Counter (traditional)"},
+"queue":{trad:`def bfs_reach(graph, start):
+    seen = {start}
+    queue = [start]
+    head = 0
+    order = []
+    while head < len(queue):
+        node = queue[head]
+        head += 1
+        order.append(node)
+        for nxt in graph.get(node, []):
+            if nxt not in seen:
+                seen.add(nxt)
+                queue.append(nxt)
+    return order`},
+"linked-list":{codeLabel:"Iterative",trad:`def count_nodes(head):
+    if head is None:
+        return 0
+    return 1 + count_nodes(head.next)`,tradLabel:"Recursive (traditional)"},
+"graph-adjacency":{trad:`def neighbors(graph, node):
+    if node not in graph:
+        return []
+    result = list(graph[node])
+    result.sort()
+    return result`},
+"two-pointers":{trad:`def pair_sum_sorted(sorted_nums, target):
+    for i in range(len(sorted_nums)):
+        for j in range(i + 1, len(sorted_nums)):
+            if sorted_nums[i] + sorted_nums[j] == target:
+                return [i, j]
+    return []`},
+"sliding-window":{trad:`def max_sum_k(nums, k):
+    if k <= 0 or k > len(nums):
+        return 0
+    best = float("-inf")
+    for i in range(len(nums) - k + 1):
+        best = max(best, sum(nums[i:i + k]))
+    return best`},
+"monotonic-stack":{trad:`def next_greater(nums):
+    result = []
+    for i in range(len(nums)):
+        nxt = -1
+        for j in range(i + 1, len(nums)):
+            if nums[j] > nums[i]:
+                nxt = nums[j]
+                break
+        result.append(nxt)
+    return result`},
+"prefix-sums":{codeLabel:"Accumulator loop",trad:`def running_sum(nums):
+    prefix = [0] * len(nums)
+    for i in range(len(nums)):
+        prefix[i] = nums[i] if i == 0 else prefix[i - 1] + nums[i]
+    return prefix`,tradLabel:"Index-based"},
+"interval-merge":{trad:`def overlaps(a, b):
+    if a[0] > b[1]:
+        return False
+    if b[0] > a[1]:
+        return False
+    return True`},
+"binary-search":{trad:`def first_ge(sorted_nums, x):
+    for i, num in enumerate(sorted_nums):
+        if num >= x:
+            return i
+    return len(sorted_nums)`},
+"bfs-dfs":{trad:`def reachable_count(graph, start):
+    seen = {start}
+    def dfs(node):
+        for nxt in graph.get(node, []):
+            if nxt not in seen:
+                seen.add(nxt)
+                dfs(nxt)
+    dfs(start)
+    return len(seen)`},
+"topo-sort":{trad:`def in_degrees(n, edges):
+    counts = {}
+    for course, prereq in edges:
+        if course not in counts:
+            counts[course] = 0
+        counts[course] += 1
+    return [counts[i] if i in counts else 0 for i in range(n)]`},
+"recursion":{codeLabel:"Recursive",trad:`def factorial(n):
+    result = 1
+    for i in range(2, n + 1):
+        result *= i
+    return result`,tradLabel:"Iterative (traditional)"}
+};
+
 /* ref entry id -> coding problems that use it (reverse links are derived) */
 const REF_LINKS = {
   "enumerate": ["two-sum","daily-temps","longest-substring"],
@@ -1786,6 +1980,7 @@ function openProblem(pid){ current=pid; editing=false; refQuery=""; renderList()
 function refCard(e){
   const probs=(REF_LINKS[e.id]||[]).map(pid=>{ const p=byId(pid); return p?'<button class="ref-link" data-pid="'+pid+'">'+esc(p.name)+'</button>':""; }).join("");
   const sol=REF_SOLUTIONS[e.id];
+  const trad=REF_TRAD[e.id]||{};
   return '<div class="ref-card">'+
     '<div class="ref-name">'+esc(e.name)+
       (e.tags||[]).map(t=>'<span class="p-tag">'+esc(t)+'</span>').join("")+'</div>'+
@@ -1799,7 +1994,10 @@ function refCard(e){
       '<textarea class="editor rp-ed" id="rp-ed-'+e.id+'" spellcheck="false">'+esc(e.starter)+'</textarea>'+
       '<div class="actions"><button class="btn-run" id="rp-'+e.id+'">Run practice</button></div>'+
       '<div class="results" id="rp-res-'+e.id+'"></div>'+
-      (sol?'<details><summary>Show solution &amp; explanation</summary><div class="body"><pre>'+esc(sol.code)+'</pre>'+esc(sol.explain||"")+'</div></details>':'')+
+      (sol?'<details><summary>Show solution &amp; explanation</summary><div class="body">'+
+        '<div class="sol-label">'+(trad.codeLabel||"Idiomatic")+'</div><pre>'+esc(sol.code)+'</pre>'+
+        (trad.trad?'<div class="sol-label">'+(trad.tradLabel||"Traditional")+'</div><pre>'+esc(trad.trad)+'</pre>':'')+
+        esc(sol.explain||"")+'</div></details>':'')+
     '</div>'+
   '</div>';
 }
