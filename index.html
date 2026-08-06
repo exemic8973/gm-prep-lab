@@ -153,6 +153,25 @@
   .sol-label{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:8px 0 3px}
   .sol-label:first-child{margin-top:0}
 
+  /* auth overlay */
+  #authOverlay{position:fixed;inset:0;background:var(--bg);z-index:50;display:flex;align-items:center;justify-content:center;padding:16px;overflow-y:auto}
+  #authOverlay.auth-hidden{display:none}
+  .auth-card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:22px 24px;width:100%;max-width:400px;margin:auto}
+  .auth-brand{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:21px;margin-top:2px}
+  .auth-tabs{display:flex;gap:6px;margin:12px 0 2px}
+  .auth-tab{flex:1;padding:7px 10px;border-radius:7px;border:1px solid var(--line);background:var(--surface);font-weight:600;font-size:13px;cursor:pointer}
+  .auth-tab.active{background:var(--ink);border-color:var(--ink);color:#fff}
+  .auth-body label{display:block;font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:10px 0 4px;font-weight:500}
+  .auth-body input[type=text],.auth-body input[type=password]{width:100%;font-family:'IBM Plex Sans',sans-serif;font-size:14px;padding:9px 11px;border:1px solid var(--line);border-radius:7px;background:#fff;color:var(--ink)}
+  .auth-body input:focus{outline:2px solid var(--charge);outline-offset:1px}
+  .auth-import{display:flex;align-items:center;gap:8px;font-family:'IBM Plex Sans',sans-serif !important;font-size:13px !important;letter-spacing:0 !important;text-transform:none !important;color:var(--ink) !important;margin-top:12px !important;cursor:pointer}
+  .auth-import input{width:15px;height:15px;accent-color:var(--charge);flex-shrink:0}
+  .auth-profiles{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-top:12px}
+  .auth-submit{width:100%;margin-top:14px;padding:10px}
+  .auth-note{margin-top:12px;font-size:11.5px;line-height:1.5}
+  .auth-err{color:var(--fail);min-height:16px;margin-top:10px}
+  .userchip{font-family:'IBM Plex Mono',monospace;font-size:11.5px;background:var(--charge-soft);color:#0B6B48;padding:3px 10px;border-radius:12px;margin-left:auto}
+
   /* visual guide (ported from GM_Prep_Visual_Guide.html) */
 
   .eyebrow{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--charge);margin-bottom:5px}
@@ -295,6 +314,36 @@
   .tnarr b{color:var(--charge)}
 </style>
 
+<div id="authOverlay">
+  <div class="auth-card">
+    <div class="eyebrow">Coding Prep &middot; Sign in</div>
+    <div class="auth-brand">Your profile, your progress</div>
+    <div class="sub" style="margin:4px 0 2px">Each profile keeps its own problems, tracker, design and behavioral progress \u2014 no one else can see or change it.</div>
+    <div class="auth-tabs">
+      <button id="authMode-login" class="auth-tab active">Log in</button>
+      <button id="authMode-register" class="auth-tab">Register</button>
+    </div>
+    <div class="auth-body">
+      <label for="authUser">Username</label>
+      <input type="text" id="authUser" autocomplete="username" spellcheck="false">
+      <label for="authPass">Password</label>
+      <input type="password" id="authPass" autocomplete="current-password">
+      <div id="authPass2row" style="display:none">
+        <label for="authPass2">Confirm password</label>
+        <input type="password" id="authPass2" autocomplete="new-password">
+      </div>
+      <label class="auth-import" id="authImportRow" style="display:none">
+        <input type="checkbox" id="authImport" checked>
+        <span>Import existing progress saved in this browser</span>
+      </label>
+      <div class="auth-profiles" id="authProfiles"></div>
+      <div class="status auth-err" id="authErr"></div>
+      <button class="btn-run auth-submit" id="authSubmit">Log in</button>
+      <div class="hintline auth-note">Profiles are stored locally in this browser (per device) and password-protected \u2014 they keep each user\u2019s progress separate on shared devices. They are not server accounts.</div>
+    </div>
+  </div>
+</div>
+
 <div class="wrap">
   <div class="eyebrow">Coding Prep &middot; Practice Lab</div>
   <h1>Coding Practice Lab</h1>
@@ -311,6 +360,8 @@
     <button id="importBtn">Import</button>
     <button id="startTimer">Start 45-min timer</button>
     <button class="btn-warn" id="resetProgress">Reset all</button>
+    <span class="userchip" id="userChip"></span>
+    <button id="logoutBtn">Log out</button>
     <span class="timer" id="timer">45:00</span>
   </div>
 
@@ -1518,16 +1569,16 @@ const BEHAV_PLAN = [
 
 /* ================= STATE ================= */
 const KEY = "gm-practice-lab-v2";
-/* localStorage-backed storage (drop-in replacement for the preview sandbox API) */
+/* Active profile session (username, or null when logged out). */
+let sessionUser = null;
+
+/* localStorage-backed storage (drop-in for the preview sandbox API).
+   Every key is namespaced by the active profile ("usr:<name>:<key>"),
+   so each user's data is fully isolated from every other user. */
 const storage = {
-  async set(k, v){
-    try{ localStorage.setItem(k, v); return true; }
-    catch(e){ return false; }
-  },
-  async get(k){
-    try{ const v = localStorage.getItem(k); return v === null ? null : { value: v }; }
-    catch(e){ return null; }
-  }
+  _p(){ return sessionUser ? "usr:"+sessionUser+":" : "anon:"; },
+  async set(k, v){ try{ localStorage.setItem(this._p()+k, v); return true; }catch(e){ return false; } },
+  async get(k){ try{ const v=localStorage.getItem(this._p()+k); return v===null?null:{value:v}; }catch(e){ return null; } }
 };
 let state = { code:{}, solved:{}, overrides:{}, custom:[], deleted:[] };
 let current = null, editing = false, pyodide = null, pyLoading = false;
@@ -3147,6 +3198,154 @@ document.addEventListener("keydown",e=>{
   ta.dispatchEvent(new Event("input",{bubbles:true}));
 });
 
+/* ================= AUTH (multi-user profiles) ================= */
+/* Threat model: profiles live in this browser/device. A password-protected
+   profile keeps OTHER USERS on the same device out of your progress. This is
+   NOT server-grade auth — anyone with devtools access to the device could
+   bypass it. Cross-device accounts would need a real backend. */
+const PROFILE_REG="coding-prep-profiles-v1";
+const AUTH_LOCK_KEY="coding-prep-authlock-v1";
+const SECURE_CTX_MSG="Password protection needs HTTPS or localhost \u2014 open the app via https or http://localhost.";
+const LEGACY_KEYS=["gm-practice-lab-v2","coding-prep-tracker-v1","coding-prep-design-v1","coding-prep-behav-v1"];
+
+/* Constant-time string compare — avoids timing side-channels on hash checks. */
+function ctEqual(a,b){
+  if(typeof a!=="string" || typeof b!=="string" || a.length!==b.length) return false;
+  let d=0;
+  for(let i=0;i<a.length;i++) d|=a.charCodeAt(i)^b.charCodeAt(i);
+  return d===0;
+}
+/* Persistent brute-force throttle — survives reloads (stored outside the per-user namespace). */
+function loadAuthLock(){ try{ const v=localStorage.getItem(AUTH_LOCK_KEY); return v?JSON.parse(v):null; }catch(e){ return null; } }
+function saveAuthLock(l){ try{ if(l) localStorage.setItem(AUTH_LOCK_KEY,JSON.stringify(l)); else localStorage.removeItem(AUTH_LOCK_KEY); }catch(e){} }
+
+async function pbkdf2Hex(password, saltHex, iterations){
+  if(!crypto.subtle) throw new Error("no-secure-context");   // fail closed — never store a weak hash
+  const salt=Uint8Array.from(saltHex.match(/.{2}/g).map(h=>parseInt(h,16)));
+  const key=await crypto.subtle.importKey("raw",new TextEncoder().encode(password),"PBKDF2",false,["deriveBits"]);
+  const bits=await crypto.subtle.deriveBits({name:"PBKDF2",salt:salt,iterations:iterations,hash:"SHA-256"},key,256);
+  return Array.from(new Uint8Array(bits)).map(b=>b.toString(16).padStart(2,"0")).join("");
+}
+function randHex(n){ const a=new Uint8Array(n); crypto.getRandomValues(a); return Array.from(a).map(b=>b.toString(16).padStart(2,"0")).join(""); }
+function getProfiles(){ try{ return JSON.parse(localStorage.getItem(PROFILE_REG))||{}; }catch(e){ return {}; } }
+function saveProfiles(p){ try{ localStorage.setItem(PROFILE_REG,JSON.stringify(p)); }catch(e){} }
+function listProfiles(){ return Object.keys(getProfiles()).sort(); }
+function hasLegacy(){ return LEGACY_KEYS.some(k=>localStorage.getItem(k)!==null); }
+
+function showAuth(){ document.getElementById("authOverlay").classList.remove("auth-hidden"); }
+function hideAuth(){ document.getElementById("authOverlay").classList.add("auth-hidden"); }
+
+function setAuthUI(mode){
+  document.getElementById("authMode-login").classList.toggle("active",mode==="login");
+  document.getElementById("authMode-register").classList.toggle("active",mode==="register");
+  document.getElementById("authPass2row").style.display=mode==="register"?"block":"none";
+  document.getElementById("authSubmit").textContent=mode==="register"?"Create profile":"Log in";
+  document.getElementById("authImportRow").style.display=(mode==="register"&&hasLegacy())?"flex":"none";
+  document.getElementById("authErr").textContent="";
+}
+function renderProfiles(){
+  const el=document.getElementById("authProfiles");
+  const users=listProfiles();
+  if(!users.length){ el.innerHTML=""; return; }
+  el.innerHTML='<span class="hintline" style="margin-right:6px">On this device:</span>'+
+    users.map(u=>'<button class="ref-link" data-u="'+esc(u)+'">'+esc(u)+'</button>').join("");
+  el.querySelectorAll("[data-u]").forEach(b=>b.addEventListener("click",()=>{
+    document.getElementById("authUser").value=b.dataset.u;
+    document.getElementById("authPass").focus();
+  }));
+}
+function importLegacy(user){
+  LEGACY_KEYS.forEach(k=>{
+    const v=localStorage.getItem(k);
+    if(v!==null) localStorage.setItem("usr:"+user+":"+k,v);
+  });
+  LEGACY_KEYS.forEach(k=>localStorage.removeItem(k));
+}
+async function authSubmit(){
+  const mode=document.getElementById("authMode-register").classList.contains("active")?"register":"login";
+  const user=document.getElementById("authUser").value.trim().toLowerCase();
+  const pass=document.getElementById("authPass").value;
+  const err=document.getElementById("authErr");
+  if(!/^[a-z0-9_-]{3,24}$/.test(user)){ err.textContent="Username: 3\u201324 characters, letters/numbers/_/-."; return; }
+  if(pass.length<6){ err.textContent="Password must be at least 6 characters."; return; }
+  const profiles=getProfiles();
+  if(mode==="register"){
+    if(profiles[user]){ err.textContent="Username already exists \u2014 log in instead."; return; }
+    if(document.getElementById("authPass2").value!==pass){ err.textContent="Passwords don\u2019t match."; return; }
+    const salt=randHex(16), iters=100000;
+    let hash;
+    try{ hash=await pbkdf2Hex(pass,salt,iters); }
+    catch(e){ err.textContent=SECURE_CTX_MSG; return; }
+    profiles[user]={salt:salt,hash:hash,iters:iters,created:Date.now()};
+    saveProfiles(profiles);
+    if(document.getElementById("authImport").checked) importLegacy(user);
+    enterSession(user);
+  } else {
+    const rec=profiles[user];
+    if(!rec){ err.textContent="Unknown username."; return; }
+    let lock=loadAuthLock();
+    if(lock && Date.now()>=lock.until){ lock=null; saveAuthLock(null); }
+    if(lock && lock.user===user && Date.now()<lock.until){
+      err.textContent="Too many failed attempts \u2014 try again in "+Math.ceil((lock.until-Date.now())/1000)+"s.";
+      return;
+    }
+    let hash;
+    try{ hash=await pbkdf2Hex(pass,rec.salt,rec.iters); }
+    catch(e){ err.textContent=SECURE_CTX_MSG; return; }
+    if(!ctEqual(hash,rec.hash)){
+      if(!lock || lock.user!==user) lock={user:user,fails:0,until:0};
+      lock.fails++;
+      if(lock.fails>=5){ lock.until=Date.now()+30000; lock.fails=0; }
+      saveAuthLock(lock);
+      err.textContent="Wrong password.";
+      return;
+    }
+    saveAuthLock(null);
+    enterSession(user);
+  }
+}
+function enterSession(user){
+  sessionUser=user;
+  try{ sessionStorage.setItem("coding-prep-session",user); }catch(e){}
+  document.getElementById("authUser").value="";
+  document.getElementById("authPass").value="";
+  document.getElementById("authPass2").value="";
+  hideAuth();
+  startApp();
+}
+function logout(){
+  sessionUser=null;
+  try{ sessionStorage.removeItem("coding-prep-session"); }catch(e){}
+  /* wipe in-memory state so the next user starts clean */
+  state={code:{},solved:{},overrides:{},custom:[],deleted:[]};
+  trackerState={startDate:null,checked:{}};
+  designState={steps:{}};
+  behavState={drafts:{},practiced:{}};
+  vizPlayStop();
+  renderProfiles();
+  setAuthUI("login");
+  showAuth();
+}
+function startApp(){
+  document.getElementById("userChip").textContent="\uD83D\uDC64 "+sessionUser;
+  load().then(()=>{ current=problems()[0].id; renderList(); renderPanel(); });
+}
+function initAuth(){
+  let u=null;
+  try{ u=sessionStorage.getItem("coding-prep-session"); }catch(e){}
+  if(u && getProfiles()[u]){ sessionUser=u; hideAuth(); startApp(); return; }
+  renderProfiles();
+  setAuthUI("login");
+  showAuth();
+}
+
+document.getElementById("authMode-login").addEventListener("click",()=>setAuthUI("login"));
+document.getElementById("authMode-register").addEventListener("click",()=>setAuthUI("register"));
+document.getElementById("authSubmit").addEventListener("click",authSubmit);
+document.getElementById("authPass").addEventListener("keydown",e=>{ if(e.key==="Enter") authSubmit(); });
+document.getElementById("authPass2").addEventListener("keydown",e=>{ if(e.key==="Enter") authSubmit(); });
+document.getElementById("logoutBtn").addEventListener("click",logout);
+
 paintTimer();
-load().then(()=>{ current=problems()[0].id; renderList(); renderPanel(); });
+initAuth();
 </script>
