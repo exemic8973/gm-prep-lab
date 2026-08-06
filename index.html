@@ -153,6 +153,102 @@
   .sol-label{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:8px 0 3px}
   .sol-label:first-child{margin-top:0}
 
+  /* visual guide (ported from GM_Prep_Visual_Guide.html) */
+
+  .eyebrow{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--charge);margin-bottom:5px}
+  h1{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:25px;letter-spacing:-.01em}
+  .sub{color:var(--muted);font-size:13.5px;margin-top:4px;line-height:1.5}
+
+  /* Primer */
+  /* Stage */
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px 18px}
+  .v-title{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:19px}
+  .v-sub{color:var(--muted);font-size:13.5px;margin-top:3px;line-height:1.5}
+  .idea{background:var(--charge-soft);border-left:3px solid var(--charge);border-radius:0 7px 7px 0;padding:10px 12px;margin:12px 0;font-size:13.5px;line-height:1.6}
+  .idea b{font-family:'Space Grotesk',sans-serif}
+
+  .stage{background:#F7FAFB;border:1px solid var(--line);border-radius:9px;padding:16px 14px;margin:12px 0;min-height:190px;overflow-x:auto}
+
+  /* Array cells */
+  .arr{display:flex;gap:5px;justify-content:center;flex-wrap:nowrap;min-width:min-content}
+  .cellwrap{display:flex;flex-direction:column;align-items:center;gap:3px}
+  .cell{width:44px;height:44px;display:flex;align-items:center;justify-content:center;border:2px solid var(--line);border-radius:7px;background:#fff;font-family:'IBM Plex Mono',monospace;font-size:14px;font-weight:500;transition:all .25s}
+  .cell.win{background:var(--cool-soft);border-color:var(--cool)}
+  .cell.cur{background:var(--hot-soft);border-color:var(--hot);transform:translateY(-3px)}
+  .cell.hit{background:var(--charge-soft);border-color:var(--charge)}
+  .cell.gone{background:#F0F2F3;border-color:var(--line);color:#B4BEC4}
+  .cell.bad{background:var(--dead-soft);border-color:var(--dead)}
+  .idx{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--muted)}
+  .ptr{font-family:'IBM Plex Mono',monospace;font-size:10.5px;font-weight:600;height:14px}
+  .ptr.l{color:var(--cool)} .ptr.r{color:var(--violet)} .ptr.c{color:var(--hot)}
+
+  /* Bars */
+  .bars{display:flex;gap:5px;align-items:flex-end;justify-content:center;height:130px}
+  .bar{width:34px;background:#C9D6DC;border-radius:4px 4px 0 0;position:relative;transition:all .25s}
+  .bar.sel{background:var(--cool)}
+  .bar .blabel{position:absolute;top:-17px;left:0;right:0;text-align:center;font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:var(--muted)}
+  .water{position:absolute;bottom:0;background:rgba(43,90,168,.18);border-top:2px solid var(--cool)}
+
+  /* Tables (hash map / heap / stack) */
+  .panels{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-top:14px}
+  .box{border:1px solid var(--line);border-radius:8px;background:#fff;padding:8px 10px;min-width:120px}
+  .box h5{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:6px;font-weight:500}
+  .kv{font-family:'IBM Plex Mono',monospace;font-size:12.5px;padding:3px 6px;border-radius:5px;margin-bottom:3px;background:#F5F8F9}
+  .kv.new{background:var(--charge-soft)}
+  .empty{font-family:'IBM Plex Mono',monospace;font-size:12px;color:#B4BEC4;padding:3px 6px}
+
+  /* Stack column */
+  .stackcol{display:flex;flex-direction:column-reverse;gap:3px;min-height:100px;justify-content:flex-start}
+  .sitem{font-family:'IBM Plex Mono',monospace;font-size:12px;background:var(--violet-soft);border:1px solid #D9C2E6;border-radius:5px;padding:4px 9px;text-align:center}
+  .sitem.top{background:var(--hot-soft);border-color:var(--hot)}
+
+  /* Grid */
+  .grid{display:inline-grid;gap:3px;justify-content:center}
+  .gcell{width:34px;height:34px;border-radius:5px;display:flex;align-items:center;justify-content:center;font-family:'IBM Plex Mono',monospace;font-size:11px;border:2px solid transparent;transition:all .2s}
+  .g-water{background:#DCE9EF;color:#8DA4B0}
+  .g-land{background:#C7DFD3;color:#2E6B52}
+  .g-visit{background:var(--charge);color:#fff}
+  .g-queue{background:var(--hot);color:#fff}
+  .g-cur{border-color:var(--ink)}
+
+  /* Graph nodes */
+  .nodes{display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
+  .node{width:52px;height:52px;border-radius:50%;border:2px solid var(--line);background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:'IBM Plex Mono',monospace;font-size:13px;transition:all .25s}
+  .node small{font-size:9px;color:var(--muted)}
+  .node.ready{border-color:var(--hot);background:var(--hot-soft)}
+  .node.done{border-color:var(--charge);background:var(--charge-soft)}
+  .edges{font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:var(--muted);text-align:center;margin-top:8px}
+
+  /* LRU chain */
+  .chain{display:flex;gap:6px;align-items:center;justify-content:center;flex-wrap:wrap}
+  .lnode{border:2px solid var(--line);border-radius:7px;background:#fff;padding:6px 10px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;text-align:center}
+  .lnode.mru{border-color:var(--charge);background:var(--charge-soft)}
+  .lnode.lru{border-color:var(--dead);background:var(--dead-soft)}
+  .lnode small{display:block;font-size:9px;color:var(--muted)}
+  .arrowc{color:var(--muted);font-family:'IBM Plex Mono',monospace;font-size:13px}
+
+  /* Bucket */
+  .bucket{width:88px;height:120px;border:3px solid var(--ink);border-radius:0 0 10px 10px;border-top:none;position:relative;margin:0 auto;background:#fff}
+  .bfill{position:absolute;bottom:0;left:0;right:0;background:linear-gradient(180deg,#14A873,#0E8A5F);border-radius:0 0 7px 7px;transition:height .35s}
+  .btok{font-family:'IBM Plex Mono',monospace;font-size:12.5px;text-align:center;margin-top:6px;color:var(--muted)}
+
+  /* Narration + controls */
+  .narr{background:var(--surface);border:1px solid var(--line);border-left:3px solid var(--hot);border-radius:0 8px 8px 0;padding:11px 13px;font-size:14px;line-height:1.6;min-height:52px}
+  .narr b{color:var(--charge)}
+  .narr code{font-family:'IBM Plex Mono',monospace;font-size:12.5px;background:#EEF3F5;padding:1px 5px;border-radius:4px}
+  .controls{display:flex;gap:8px;align-items:center;margin-top:11px;flex-wrap:wrap}
+  button{font-family:'IBM Plex Sans',sans-serif;font-size:13px;font-weight:600;padding:8px 14px;border-radius:7px;border:1px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer}
+  .btn-play{background:var(--charge);border-color:var(--charge);color:#fff}
+  .btn-play:hover{background:#0B7350;border-color:#0B7350}
+  .step-count{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--muted);margin-left:auto}
+  .track{height:4px;background:var(--line);border-radius:2px;margin-top:10px;overflow:hidden}
+  .track-fill{height:100%;background:var(--charge);width:0;transition:width .2s}
+
+  details.code{margin-top:12px;border:1px solid var(--line);border-radius:8px;padding:10px 12px;background:#FAFCFC}
+  details.code summary{cursor:pointer;font-weight:600;font-size:13.5px}
+  details.code pre{background:#12222C;color:#DCE7EC;font-family:'IBM Plex Mono',monospace;font-size:12.5px;line-height:1.55;padding:12px;border-radius:7px;overflow-x:auto;margin-top:9px}
+  @media (prefers-reduced-motion: reduce){ *{transition:none !important} }
+
   /* form */
   .form label{display:block;font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:12px 0 4px;font-weight:500}
   .form input[type=text], .form select, .form textarea{width:100%;font-family:'IBM Plex Sans',sans-serif;font-size:13.5px;padding:8px 10px;border:1px solid var(--line);border-radius:7px;background:#fff;color:var(--ink)}
@@ -1548,14 +1644,6 @@ function renderPanel(){
   const ed=document.getElementById("editor");
   ed.value=saved;
   ed.addEventListener("input",()=>{ state.code[p.id]=ed.value; save(); });
-  ed.addEventListener("keydown",e=>{
-    if(e.key==="Tab"){ e.preventDefault();
-      const s=ed.selectionStart,en=ed.selectionEnd;
-      ed.value=ed.value.slice(0,s)+"    "+ed.value.slice(en);
-      ed.selectionStart=ed.selectionEnd=s+4;
-      state.code[p.id]=ed.value; save();
-    }
-  });
   document.getElementById("runBtn").addEventListener("click",()=>runTests(p));
   document.getElementById("resetCode").addEventListener("click",()=>{
     if(!confirm("Reset your code to the starter template?")) return;
@@ -1971,6 +2059,648 @@ function renderTracer(){
 }
 function trStop(){ if(TR.playing){ clearInterval(TR.playing); TR.playing=null; } }
 
+/* ================= VISUAL GUIDE (ported from GM_Prep_Visual_Guide.html) ================= */
+/* ============ helpers to build frames ============ */
+function cells(arr, marks, ptrs){
+  marks = marks || {}; ptrs = ptrs || {};
+  let h = '<div class="arr">';
+  arr.forEach((v,i) => {
+    const labels = [];
+    for(const p in ptrs){ if(ptrs[p] === i) labels.push('<span class="ptr '+(p==='left'?'l':p==='right'?'r':'c')+'">'+p+'</span>'); }
+    h += '<div class="cellwrap"><div class="ptr">'+(labels.join(" ")||"&nbsp;")+'</div>'+
+         '<div class="cell '+(marks[i]||"")+'">'+v+'</div>'+
+         '<div class="idx">'+i+'</div></div>';
+  });
+  return h + '</div>';
+}
+function box(title, entries){
+  let h = '<div class="box"><h5>'+title+'</h5>';
+  if(!entries.length) h += '<div class="empty">empty</div>';
+  entries.forEach(e => h += '<div class="kv '+(e.isNew?"new":"")+'">'+e.text+'</div>');
+  return h + '</div>';
+}
+function panels(inner){ return '<div class="panels">'+inner+'</div>'; }
+
+/* ============ VISUALIZATIONS ============ */
+const VIS = [];
+
+/* ---- 1. Two Sum ---- */
+(function(){
+  const nums=[2,7,11,15], target=9, frames=[];
+  const seen={};
+  frames.push({html: cells(nums,{},{}) + panels(box("dict: value \u2192 index",[])),
+    narr:"We want two numbers that add to <b>9</b>. The slow way checks every pair. Instead we'll walk through once, remembering what we've seen in a dict."});
+  for(let i=0;i<nums.length;i++){
+    const need = target - nums[i];
+    const entries = Object.keys(seen).map(k=>({text:k+" \u2192 "+seen[k]}));
+    frames.push({html: cells(nums,{[i]:"cur"},{i:i}) + panels(box("dict: value \u2192 index",entries)),
+      narr:"At index <b>"+i+"</b> the value is <code>"+nums[i]+"</code>. To reach 9 we'd need <code>"+need+"</code>. Is "+need+" already in our dict?"});
+    if(need in seen){
+      frames.push({html: cells(nums,{[i]:"hit",[seen[need]]:"hit"},{i:i}) + panels(box("dict: value \u2192 index",entries)),
+        narr:"Yes! <code>"+need+"</code> was stored at index <b>"+seen[need]+"</b>. Answer: <code>["+seen[need]+", "+i+"]</code>. We found it in one pass — <b>O(n)</b> instead of O(n\u00B2)."});
+      break;
+    }
+    seen[nums[i]] = i;
+    const e2 = Object.keys(seen).map(k=>({text:k+" \u2192 "+seen[k], isNew: Number(k)===nums[i]}));
+    frames.push({html: cells(nums,{[i]:"win"},{i:i}) + panels(box("dict: value \u2192 index",e2)),
+      narr:"Not there yet. So we store <code>"+nums[i]+" \u2192 "+i+"</code> in the dict and move on. Every number we pass gets remembered."});
+  }
+  VIS.push({id:"two-sum", name:"Two Sum", title:"Two Sum — the hash map trick",
+    sub:"Find two numbers that add up to a target.",
+    idea:"<b>Core idea:</b> instead of comparing every pair, walk the list once and remember each number you pass. Then for each new number you only have to ask one question: \"have I already seen the piece that completes this?\"",
+    code:`def two_sum(nums, target):
+    seen = {}                      # value -> index
+    for i, num in enumerate(nums):
+        complement = target - num
+        if complement in seen:     # instant lookup
+            return [seen[complement], i]
+        seen[num] = i              # remember and move on
+    return []`, frames});
+})();
+
+/* ---- 2. Sliding Window ---- */
+(function(){
+  const s="pwwkew", frames=[]; let left=0, best=0; const last={};
+  frames.push({html: cells(s.split(""),{},{}) + panels(box("last seen: char \u2192 index",[])),
+    narr:"Goal: the longest stretch with <b>no repeated letters</b>. We'll drag a window across the string — <span style='color:#2B5AA8'>left</span> and <span style='color:#7A3E97'>right</span> mark its edges."});
+  for(let right=0; right<s.length; right++){
+    const ch=s[right];
+    const marks={}; for(let k=left;k<right;k++) marks[k]="win"; marks[right]="cur";
+    const ent=Object.keys(last).map(k=>({text:k+" \u2192 "+last[k]}));
+    frames.push({html: cells(s.split(""),marks,{left:left,right:right}) + panels(box("last seen: char \u2192 index",ent)),
+      narr:"Right edge moves to index <b>"+right+"</b> (letter <code>"+ch+"</code>). Was this letter already inside the window?"});
+    if(ch in last && last[ch] >= left){
+      const old=left; left = last[ch]+1;
+      const m2={}; for(let k=left;k<=right;k++) m2[k]="win"; m2[right]="cur"; m2[last[ch]]="gone";
+      frames.push({html: cells(s.split(""),m2,{left:left,right:right}) + panels(box("last seen: char \u2192 index",ent)),
+        narr:"Yes — <code>"+ch+"</code> was at index "+last[ch]+". So we <b>jump</b> left from "+old+" to "+left+", skipping past the duplicate in one move instead of shuffling one step at a time."});
+    }
+    last[ch]=right;
+    const len=right-left+1; const grew = len>best; best=Math.max(best,len);
+    const m3={}; for(let k=left;k<=right;k++) m3[k]="win";
+    const e3=Object.keys(last).map(k=>({text:k+" \u2192 "+last[k], isNew:k===ch}));
+    frames.push({html: cells(s.split(""),m3,{left:left,right:right}) + panels(box("last seen: char \u2192 index",e3)),
+      narr:"Window is now <code>\""+s.slice(left,right+1)+"\"</code>, length <b>"+len+"</b>. "+(grew?"That's a new best!":"Best so far stays <b>"+best+"</b>.")});
+  }
+  frames.push({html: cells(s.split(""),{2:"hit",3:"hit",4:"hit"},{}) + panels(box("result",[{text:"longest = "+best,isNew:true}])),
+    narr:"Done in one pass: <b>"+best+"</b>. Each edge only ever moved forward, so this is <b>O(n)</b> — we never re-scanned anything."});
+  VIS.push({id:"window", name:"Sliding Window", title:"Sliding Window — longest substring without repeats",
+    sub:"Find the longest stretch of a string with no repeated characters.",
+    idea:"<b>Core idea:</b> keep a window that is always valid. Push the right edge forward to grow it; when a rule breaks, pull the left edge forward just far enough to fix it. Both edges only move one direction, so the whole scan stays O(n).",
+    code:`def length_of_longest_substring(s):
+    last_seen = {}
+    left = best = 0
+    for right, ch in enumerate(s):
+        if ch in last_seen and last_seen[ch] >= left:
+            left = last_seen[ch] + 1     # jump past the duplicate
+        last_seen[ch] = right
+        best = max(best, right - left + 1)
+    return best`, frames});
+})();
+
+/* ---- 3. Two Pointers ---- */
+(function(){
+  const h=[1,8,6,2,5,4,8,3,7], frames=[]; let l=0,r=h.length-1,best=0;
+  const maxH=Math.max(...h);
+  function draw(l,r,area){
+    const hh=Math.min(h[l],h[r]);
+    let out='<div class="bars">';
+    h.forEach((v,i)=>{
+      const sel=(i===l||i===r);
+      out+='<div class="bar '+(sel?"sel":"")+'" style="height:'+(v/maxH*105+8)+'px"><span class="blabel">'+v+'</span></div>';
+    });
+    out+='</div>';
+    out+='<div style="text-align:center;font-family:IBM Plex Mono,monospace;font-size:12px;color:var(--muted);margin-top:8px">width '+(r-l)+' \u00D7 height '+hh+' = <b style="color:var(--ink)">'+area+'</b> &nbsp;|&nbsp; best '+Math.max(best,area)+'</div>';
+    return out;
+  }
+  frames.push({html:draw(l,r,Math.min(h[l],h[r])*(r-l)),
+    narr:"Each bar is a wall. We want the two walls holding the <b>most water</b>. Start as wide as possible: one pointer at each end."});
+  while(l<r){
+    const area=Math.min(h[l],h[r])*(r-l);
+    const isBest=area>best; best=Math.max(best,area);
+    frames.push({html:draw(l,r,area),
+      narr:"Walls of height <code>"+h[l]+"</code> and <code>"+h[r]+"</code>, width <code>"+(r-l)+"</code>. Water spills over the shorter wall, so area = "+Math.min(h[l],h[r])+" \u00D7 "+(r-l)+" = <b>"+area+"</b>."+(isBest?" New best!":"")});
+    if(l>=r) break;
+    const moveLeft = h[l]<h[r];
+    frames.push({html:draw(l,r,area),
+      narr:"Which pointer moves? Width always shrinks, so the <b>only</b> way to gain is a taller short wall. The shorter wall is on the <b>"+(moveLeft?"left":"right")+"</b> (<code>"+(moveLeft?h[l]:h[r])+"</code>) — so we move that one. Moving the taller one could never help."});
+    if(moveLeft) l++; else r--;
+    if(l>=r) break;
+  }
+  frames.push({html:draw(1,8,49), narr:"Pointers met. Best area: <b>"+best+"</b>. We checked only n positions instead of every pair — <b>O(n)</b> instead of O(n\u00B2)."});
+  VIS.push({id:"twoptr", name:"Two Pointers", title:"Two Pointers — container with most water",
+    sub:"Pick two walls that trap the largest area of water.",
+    idea:"<b>Core idea:</b> start at the widest possible pair and squeeze inward. Since width only shrinks, the only hope of a bigger area is a taller limiting wall — and the limit is always the shorter wall. So it's always safe to discard the shorter one.",
+    code:`def max_area(heights):
+    left, right = 0, len(heights) - 1
+    best = 0
+    while left < right:
+        height = min(heights[left], heights[right])
+        best = max(best, height * (right - left))
+        if heights[left] < heights[right]:
+            left += 1          # move the shorter side
+        else:
+            right -= 1
+    return best`, frames});
+})();
+
+/* ---- 4. Prefix / Suffix ---- */
+(function(){
+  const nums=[1,2,3,4], frames=[]; const res=[1,1,1,1];
+  frames.push({html: cells(nums,{},{}) + panels(box("result (building)",[{text:"[1, 1, 1, 1]"}])),
+    narr:"Each answer slot should hold the product of <b>everything except itself</b> — and we can't use division. We'll do it in two sweeps."});
+  let pre=1;
+  for(let i=0;i<nums.length;i++){
+    res[i]=pre;
+    frames.push({html: cells(nums,{[i]:"cur"},{i:i}) + panels(box("result after LEFT sweep",[{text:"["+res.join(", ")+"]",isNew:true}]) + box("running left product",[{text:String(pre)}])),
+      narr:"Sweep 1 (left \u2192 right): slot <b>"+i+"</b> gets <code>"+pre+"</code>, the product of everything to its <b>left</b>. Then we fold in <code>"+nums[i]+"</code> for the next slot."});
+    pre*=nums[i];
+  }
+  let suf=1;
+  for(let i=nums.length-1;i>=0;i--){
+    res[i]*=suf;
+    frames.push({html: cells(nums,{[i]:"hit"},{i:i}) + panels(box("result",[{text:"["+res.join(", ")+"]",isNew:true}]) + box("running right product",[{text:String(suf)}])),
+      narr:"Sweep 2 (right \u2192 left): slot <b>"+i+"</b> multiplies in <code>"+suf+"</code>, the product of everything to its <b>right</b>. Left \u00D7 right = everything except itself."});
+    suf*=nums[i];
+  }
+  frames.push({html: cells(nums,{},{}) + panels(box("final",[{text:"["+res.join(", ")+"]",isNew:true}])),
+    narr:"Done: <code>["+res.join(", ")+"]</code>. Two passes, no division, no nested loops — <b>O(n)</b>."});
+  VIS.push({id:"prefix", name:"Prefix / Suffix", title:"Prefix & Suffix — product of array except self",
+    sub:"Each slot gets the product of every other element.",
+    idea:"<b>Core idea:</b> the answer at any position is (everything on its left) \u00D7 (everything on its right). Sweep once forward accumulating left products, once backward multiplying in right products. Two passes beat n\u00B2 comparisons.",
+    code:`def product_except_self(nums):
+    n = len(nums)
+    result = [1] * n
+    prefix = 1
+    for i in range(n):                 # left sweep
+        result[i] = prefix
+        prefix *= nums[i]
+    suffix = 1
+    for i in range(n - 1, -1, -1):     # right sweep
+        result[i] *= suffix
+        suffix *= nums[i]
+    return result`, frames});
+})();
+
+/* ---- 5. Merge Intervals ---- */
+(function(){
+  const raw=[[1,3],[2,6],[8,10],[15,18]], frames=[];
+  const SC=13, OFF=10;
+  function line(items, merged, curIdx){
+    let h='<div style="position:relative;height:'+(30*(items.length+merged.length+1))+'px;min-width:280px">';
+    let row=0;
+    items.forEach((iv,i)=>{
+      const cls = i===curIdx ? "var(--hot)" : "#C9D6DC";
+      h+='<div style="position:absolute;top:'+(row*26)+'px;left:'+(OFF+iv[0]*SC)+'px;width:'+((iv[1]-iv[0])*SC)+'px;height:18px;background:'+cls+';border-radius:4px"></div>'+
+         '<div style="position:absolute;top:'+(row*26)+'px;left:'+(OFF+iv[0]*SC+3)+'px;font-family:IBM Plex Mono,monospace;font-size:10.5px;color:#14232E;line-height:18px">'+iv[0]+"\u2013"+iv[1]+'</div>';
+      row++;
+    });
+    merged.forEach(iv=>{
+      h+='<div style="position:absolute;top:'+(row*26)+'px;left:'+(OFF+iv[0]*SC)+'px;width:'+((iv[1]-iv[0])*SC)+'px;height:18px;background:var(--charge);border-radius:4px"></div>'+
+         '<div style="position:absolute;top:'+(row*26)+'px;left:'+(OFF+iv[0]*SC+3)+'px;font-family:IBM Plex Mono,monospace;font-size:10.5px;color:#fff;line-height:18px">'+iv[0]+"\u2013"+iv[1]+'</div>';
+      row++;
+    });
+    return h+'</div>';
+  }
+  frames.push({html:line(raw,[],-1), narr:"Four time ranges, some overlapping. We want to fuse the overlaps. <b>Step zero: sort by start time</b> — this input already is."});
+  const merged=[raw[0].slice()];
+  frames.push({html:line(raw,merged,0), narr:"Take the first range <code>1\u20133</code> as our starting merged block (shown in green)."});
+  for(let i=1;i<raw.length;i++){
+    const [s,e]=raw[i];
+    frames.push({html:line(raw,merged.map(m=>m.slice()),i),
+      narr:"Next range <code>"+s+"\u2013"+e+"</code> (orange). Does its start ("+s+") land at or before the end of our last merged block ("+merged[merged.length-1][1]+")?"});
+    if(s<=merged[merged.length-1][1]){
+      const old=merged[merged.length-1][1];
+      merged[merged.length-1][1]=Math.max(old,e);
+      frames.push({html:line(raw,merged.map(m=>m.slice()),i),
+        narr:"Yes — they overlap, so we <b>stretch</b> the block's end to <code>"+merged[merged.length-1][1]+"</code>. Note we take the <b>max</b>: if the new range sat entirely inside, shrinking would be a bug."});
+    } else {
+      merged.push([s,e]);
+      frames.push({html:line(raw,merged.map(m=>m.slice()),i),
+        narr:"No overlap — there's a gap. So <code>"+s+"\u2013"+e+"</code> starts a brand new merged block."});
+    }
+  }
+  frames.push({html:line([],merged,-1), narr:"Final answer: <code>"+JSON.stringify(merged)+"</code>. The sort costs O(n log n); the sweep after it is just O(n)."});
+  VIS.push({id:"intervals", name:"Merge Intervals", title:"Merge Intervals — fusing overlapping ranges",
+    sub:"Combine time ranges that overlap into single blocks.",
+    idea:"<b>Core idea:</b> sort by start time first — that guarantees anything overlapping the current block must come next. Then walk once, either stretching the current block or starting a new one. Sorting is what makes a single pass sufficient.",
+    code:`def merge(intervals):
+    if not intervals: return []
+    intervals.sort(key=lambda x: x[0])       # sort first!
+    merged = [intervals[0][:]]
+    for start, end in intervals[1:]:
+        if start <= merged[-1][1]:           # overlaps
+            merged[-1][1] = max(merged[-1][1], end)
+        else:
+            merged.append([start, end])      # gap: new block
+    return merged`, frames});
+})();
+
+/* ---- 6. Monotonic Stack ---- */
+(function(){
+  const t=[73,74,75,71,69,72,76,73], frames=[]; const res=new Array(t.length).fill(0); const st=[];
+  function sview(){ return st.slice().map(i=>({text:"idx "+i+" ("+t[i]+"\u00B0)"})); }
+  frames.push({html: cells(t,{},{}) + panels(box("stack: waiting days",[]) + box("answers",[{text:"["+res.join(", ")+"]"}])),
+    narr:"For each day, how many days until it gets warmer? The stack holds days that are <b>still waiting</b> for a warmer day."});
+  for(let i=0;i<t.length;i++){
+    const marks={}; st.forEach(k=>marks[k]="win"); marks[i]="cur";
+    frames.push({html: cells(t,marks,{i:i}) + panels(box("stack: waiting days",sview()) + box("answers",[{text:"["+res.join(", ")+"]"}])),
+      narr:"Day <b>"+i+"</b> is <code>"+t[i]+"\u00B0</code>. Does it resolve anyone waiting on the stack?"});
+    while(st.length && t[st[st.length-1]] < t[i]){
+      const prev=st.pop(); res[prev]=i-prev;
+      const m2={}; st.forEach(k=>m2[k]="win"); m2[i]="cur"; m2[prev]="hit";
+      frames.push({html: cells(t,m2,{i:i}) + panels(box("stack: waiting days",sview()) + box("answers",[{text:"["+res.join(", ")+"]",isNew:true}])),
+        narr:"Yes! Day <b>"+prev+"</b> (<code>"+t[prev]+"\u00B0</code>) was waiting and "+t[i]+"\u00B0 is warmer. It waited <code>"+(i-prev)+"</code> day(s). Pop it off — it's answered forever."});
+    }
+    st.push(i);
+    const m3={}; st.forEach(k=>m3[k]="win");
+    frames.push({html: cells(t,m3,{i:i}) + panels(box("stack: waiting days",sview()) + box("answers",[{text:"["+res.join(", ")+"]"}])),
+      narr:"Day <b>"+i+"</b> now joins the stack to wait for its own warmer day."});
+  }
+  frames.push({html: cells(t,{},{}) + panels(box("stack: still waiting (answer 0)",sview()) + box("answers",[{text:"["+res.join(", ")+"]",isNew:true}])),
+    narr:"Anyone left on the stack never got a warmer day, so they keep <code>0</code>. Each day is pushed and popped at most once — that's why the nested loop is still <b>O(n)</b>, not O(n\u00B2)."});
+  VIS.push({id:"monostack", name:"Monotonic Stack", title:"Monotonic Stack — daily temperatures",
+    sub:"How many days until a warmer temperature?",
+    idea:"<b>Core idea:</b> keep a stack of unanswered items, always in decreasing order. When a bigger value arrives, it instantly answers everything smaller sitting on top. Recognize this pattern whenever a problem says \"next greater\" or \"next smaller.\"",
+    code:`def daily_temperatures(temps):
+    result = [0] * len(temps)
+    stack = []                          # indices still waiting
+    for i, temp in enumerate(temps):
+        while stack and temps[stack[-1]] < temp:
+            prev = stack.pop()          # this day is now answered
+            result[prev] = i - prev
+        stack.append(i)
+    return result`, frames});
+})();
+
+/* ---- 7. Min-Heap / Meeting Rooms ---- */
+(function(){
+  const mt=[[0,30],[5,10],[15,20]], frames=[]; const heap=[];
+  function hv(){ return heap.slice().sort((a,b)=>a-b).map((e,i)=>({text:(i===0?"\u2193 soonest  ":"           ")+"ends "+e})); }
+  frames.push({html: panels(box("meetings (sorted by start)",mt.map(m=>({text:m[0]+" \u2192 "+m[1]}))) + box("rooms in use (heap of end times)",[])),
+    narr:"How many rooms do we need? We'll process meetings in start order and keep a <b>heap</b> of end times — the heap always shows the room freeing up soonest."});
+  mt.forEach(([s,e],i)=>{
+    frames.push({html: panels(box("meetings (sorted by start)",mt.map((m,j)=>({text:m[0]+" \u2192 "+m[1], isNew:j===i}))) + box("rooms in use (heap of end times)",hv())),
+      narr:"Meeting <code>"+s+" \u2192 "+e+"</code> arrives. "+(heap.length? "The soonest room frees at <b>"+Math.min(...heap)+"</b>. Has it freed by "+s+"?" : "No rooms open yet.")});
+    const soonest = heap.length ? Math.min(...heap) : Infinity;
+    if(heap.length && soonest <= s){
+      heap.splice(heap.indexOf(soonest),1); heap.push(e);
+      frames.push({html: panels(box("meetings (sorted by start)",mt.map((m,j)=>({text:m[0]+" \u2192 "+m[1], isNew:j===i}))) + box("rooms in use (heap of end times)",hv())),
+        narr:"Yes — that room emptied at "+soonest+", so we <b>reuse</b> it. Replace its end time with <code>"+e+"</code>. Room count unchanged: <b>"+heap.length+"</b>."});
+    } else {
+      heap.push(e);
+      frames.push({html: panels(box("meetings (sorted by start)",mt.map((m,j)=>({text:m[0]+" \u2192 "+m[1], isNew:j===i}))) + box("rooms in use (heap of end times)",hv())),
+        narr:"No room is free, so we <b>open a new one</b>. Rooms in use: <b>"+heap.length+"</b>."});
+    }
+  });
+  frames.push({html: panels(box("answer",[{text:"rooms needed = "+heap.length,isNew:true}]) + box("rooms in use",hv())),
+    narr:"The heap's size <b>is</b> the answer: <b>"+heap.length+"</b> rooms. This same pattern sizes worker pools and connection limits in real backend systems."});
+  VIS.push({id:"heap", name:"Min-Heap", title:"Min-Heap — meeting rooms II",
+    sub:"Minimum rooms needed to hold all meetings.",
+    idea:"<b>Core idea:</b> process meetings in start order, and keep the end times of busy rooms in a min-heap. The heap's top is always the room freeing up soonest — the only one worth checking. If it's free, reuse it; otherwise open a new room. The heap's size is the answer.",
+    code:`import heapq
+
+def min_meeting_rooms(intervals):
+    if not intervals: return 0
+    intervals.sort(key=lambda x: x[0])
+    end_times = []                       # min-heap
+    for start, end in intervals:
+        if end_times and end_times[0] <= start:
+            heapq.heapreplace(end_times, end)   # reuse the freed room
+        else:
+            heapq.heappush(end_times, end)      # open a new room
+    return len(end_times)`, frames});
+})();
+
+/* ---- 8. BFS grid ---- */
+(function(){
+  const g=[["1","1","0"],["1","0","0"],["0","0","1"]], frames=[];
+  const st=g.map(r=>r.slice());
+  function draw(state, queue, cur, count){
+    let h='<div style="text-align:center"><div class="grid" style="grid-template-columns:repeat(3,34px)">';
+    for(let r=0;r<3;r++) for(let c=0;c<3;c++){
+      let cls = state[r][c]==="0" ? "g-water" : "g-land";
+      if(state[r][c]==="V") cls="g-visit";
+      if(state[r][c]==="Q") cls="g-queue";
+      const isCur = cur && cur[0]===r && cur[1]===c;
+      h+='<div class="gcell '+cls+' '+(isCur?"g-cur":"")+'">'+(state[r][c]==="1"?"L":state[r][c]==="0"?"~":state[r][c]==="Q"?"Q":"\u2713")+'</div>';
+    }
+    h+='</div></div>';
+    h+=panels(box("queue",queue.map(q=>({text:"("+q[0]+","+q[1]+")"}))) + box("islands found",[{text:String(count)}]));
+    return h;
+  }
+  frames.push({html:draw(st,[],null,0),
+    narr:"<code>L</code> = land, <code>~</code> = water. An island is land connected up/down/left/right. We scan every cell; each time we hit <b>unvisited</b> land, that's a new island — then we flood-fill it so we never count it twice."});
+  let count=0;
+  for(let r=0;r<3;r++) for(let c=0;c<3;c++){
+    if(st[r][c]!=="1") continue;
+    count++;
+    const q=[[r,c]]; st[r][c]="Q";
+    frames.push({html:draw(st,q,[r,c],count),
+      narr:"Found unvisited land at <b>("+r+","+c+")</b> \u2014 island #<b>"+count+"</b>. Add it to the queue and start flooding outward."});
+    while(q.length){
+      const [cr,cc]=q.shift(); st[cr][cc]="V";
+      frames.push({html:draw(st,q,[cr,cc],count),
+        narr:"Take <b>("+cr+","+cc+")</b> off the queue and mark it visited \u2713. Now check its four neighbors."});
+      const added=[];
+      [[1,0],[-1,0],[0,1],[0,-1]].forEach(([dr,dc])=>{
+        const nr=cr+dr,nc=cc+dc;
+        if(nr>=0&&nr<3&&nc>=0&&nc<3&&st[nr][nc]==="1"){ st[nr][nc]="Q"; q.push([nr,nc]); added.push("("+nr+","+nc+")"); }
+      });
+      if(added.length) frames.push({html:draw(st,q,[cr,cc],count),
+        narr:"Neighboring land found at "+added.join(", ")+". Queue them and <b>mark them immediately</b> \u2014 marking on enqueue (not on dequeue) stops the same cell entering the queue twice."});
+    }
+    frames.push({html:draw(st,[],null,count),
+      narr:"Queue empty \u2014 island #"+count+" is fully flooded. Its cells are all marked, so the scan will skip right over them."});
+  }
+  frames.push({html:draw(st,[],null,count), narr:"Every cell visited exactly once. Total islands: <b>"+count+"</b>."});
+  VIS.push({id:"bfs", name:"BFS on a Grid", title:"BFS — number of islands",
+    sub:"Count connected regions of land in a grid.",
+    idea:"<b>Core idea:</b> scan for any unvisited land. Each one you find is a new island — then flood outward from it with a queue, marking everything connected, so the rest of that island is never counted again. Using a queue (BFS) instead of recursion avoids blowing the call stack on a big grid.",
+    code:`from collections import deque
+
+def num_islands(grid):
+    if not grid or not grid[0]: return 0
+    rows, cols = len(grid), len(grid[0])
+    count = 0
+    for r in range(rows):
+        for c in range(cols):
+            if grid[r][c] != '1': continue
+            count += 1
+            queue = deque([(r, c)])
+            grid[r][c] = '0'                    # mark on enqueue
+            while queue:
+                cr, cc = queue.popleft()
+                for dr, dc in ((1,0),(-1,0),(0,1),(0,-1)):
+                    nr, nc = cr + dr, cc + dc
+                    if 0 <= nr < rows and 0 <= nc < cols and grid[nr][nc] == '1':
+                        grid[nr][nc] = '0'
+                        queue.append((nr, nc))
+    return count`, frames});
+})();
+
+/* ---- 9. Topological sort ---- */
+(function(){
+  const n=4, prereq=[[1,0],[2,1],[3,2]], frames=[];
+  const graph={}, indeg=new Array(n).fill(0);
+  prereq.forEach(([c,p])=>{ (graph[p]=graph[p]||[]).push(c); indeg[c]++; });
+  const done=new Set(); let q=[];
+  function draw(cur){
+    let h='<div class="nodes">';
+    for(let i=0;i<n;i++){
+      const cls = done.has(i)?"done":(indeg[i]===0?"ready":"");
+      h+='<div class="node '+cls+' '+(cur===i?"g-cur":"")+'">'+i+'<small>needs '+indeg[i]+'</small></div>';
+    }
+    h+='</div><div class="edges">must take: 0 &rarr; 1 &rarr; 2 &rarr; 3</div>';
+    h+=panels(box("queue: ready to take",q.map(x=>({text:"course "+x}))) + box("completed",[{text:done.size+" of "+n}]));
+    return h;
+  }
+  frames.push({html:draw(null),
+    narr:"Each course shows how many prerequisites it still <b>needs</b>. Course 0 needs none, so it's ready (orange). The question is really: is there a <b>cycle</b> that makes finishing impossible?"});
+  q=[...Array(n).keys()].filter(i=>indeg[i]===0);
+  frames.push({html:draw(null), narr:"Put every course with <b>zero</b> remaining prerequisites into the queue. Those are the ones we can take right now."});
+  while(q.length){
+    const c=q.shift(); done.add(c);
+    frames.push({html:draw(c), narr:"Take course <b>"+c+"</b> \u2014 completed \u2713. Now anything that was waiting on it gets one step closer."});
+    (graph[c]||[]).forEach(nx=>{
+      indeg[nx]--;
+      if(indeg[nx]===0) q.push(nx);
+      frames.push({html:draw(c),
+        narr:"Course <b>"+nx+"</b> needed "+(indeg[nx]+1)+", now needs <b>"+indeg[nx]+"</b>."+(indeg[nx]===0?" It just became available \u2014 into the queue.":"")});
+    });
+  }
+  frames.push({html:draw(null),
+    narr:"Completed <b>"+done.size+"</b> of <b>"+n+"</b> courses. They match, so there was no cycle \u2014 the answer is <b>True</b>. If a cycle existed, those courses would deadlock at need-count 1 forever and the totals wouldn't match."});
+  VIS.push({id:"topo", name:"Topological Sort", title:"Topological Sort — course schedule",
+    sub:"Can you finish all courses, or is there a circular dependency?",
+    idea:"<b>Core idea (Kahn's algorithm):</b> count how many prerequisites each item still needs. Repeatedly take anything at zero and decrement its dependents. If you can't process everything, the leftovers are stuck in a cycle. This is the same check as detecting circular dependencies between microservices or build steps.",
+    code:`from collections import deque, defaultdict
+
+def can_finish(num_courses, prerequisites):
+    graph = defaultdict(list)
+    in_degree = [0] * num_courses
+    for course, prereq in prerequisites:
+        graph[prereq].append(course)
+        in_degree[course] += 1
+
+    queue = deque(c for c in range(num_courses) if in_degree[c] == 0)
+    completed = 0
+    while queue:
+        course = queue.popleft()
+        completed += 1
+        for nxt in graph[course]:
+            in_degree[nxt] -= 1
+            if in_degree[nxt] == 0:
+                queue.append(nxt)
+    return completed == num_courses      # short means a cycle</code>`, frames});
+})();
+
+/* ---- 10. LRU cache ---- */
+(function(){
+  const frames=[], cap=2; let chain=[]; const map={};
+  function draw(note, evicted){
+    let h='<div style="text-align:center;font-family:IBM Plex Mono,monospace;font-size:10.5px;color:var(--muted);margin-bottom:6px">HEAD (most recently used) &nbsp;&rarr;&nbsp; TAIL (evict from here)</div><div class="chain">';
+    if(!chain.length) h+='<div class="empty">empty cache</div>';
+    chain.forEach((k,i)=>{
+      const cls = i===0?"mru":(i===chain.length-1&&chain.length>1?"lru":"");
+      h+='<div class="lnode '+cls+'">'+k+"="+map[k]+'<small>'+(i===0?"newest":(i===chain.length-1&&chain.length>1?"oldest":""))+'</small></div>';
+      if(i<chain.length-1) h+='<span class="arrowc">&#8646;</span>';
+    });
+    h+='</div>';
+    h+=panels(box("dict: key \u2192 node",chain.map(k=>({text:k+" \u2192 node("+k+"="+map[k]+")"}))) + box("capacity",[{text:chain.length+" / "+cap}]) + (evicted?box("just evicted",[{text:evicted,isNew:true}]):""));
+    return h;
+  }
+  function put(k,v){ if(k in map){ chain=chain.filter(x=>x!==k);} map[k]=v; chain.unshift(k); }
+  frames.push({html:draw(), narr:"An <b>LRU cache</b> holds only "+cap+" items. When it's full and something new arrives, it throws out whatever was used <b>least recently</b>. Two structures work together: a chain (order) and a dict (instant lookup)."});
+  put(1,1);
+  frames.push({html:draw(), narr:"<code>put(1,1)</code> \u2014 new item goes to the <b>front</b> of the chain, and the dict records where to find it."});
+  put(2,2);
+  frames.push({html:draw(), narr:"<code>put(2,2)</code> \u2014 also to the front. Key 1 is now the oldest, sitting at the tail. Cache is full."});
+  chain=chain.filter(x=>x!==1); chain.unshift(1);
+  frames.push({html:draw(), narr:"<code>get(1)</code> returns <b>1</b>. Crucially, <b>using</b> an item makes it the newest \u2014 so key 1 moves to the front. Now key 2 is the oldest. This is the whole point of \"recently used.\""});
+  const ev="key 2 (was least recently used)";
+  delete map[2]; chain=chain.filter(x=>x!==2); put(3,3);
+  frames.push({html:draw(null,ev), narr:"<code>put(3,3)</code> \u2014 but we're at capacity. So we drop the item at the <b>tail</b>: key 2. Key 3 enters at the front. Note we must delete key 2 from the <b>dict</b> too \u2014 forgetting that is the #1 bug in this problem."});
+  frames.push({html:draw(), narr:"<code>get(2)</code> now returns <b>-1</b> \u2014 it was evicted. Both operations are <b>O(1)</b>: the dict finds any node instantly, and rewiring the chain is just a couple of pointer swaps."});
+  VIS.push({id:"lru", name:"LRU Cache", title:"LRU Cache — the most-asked design question",
+    sub:"A fixed-size cache that evicts whatever was used least recently.",
+    idea:"<b>Core idea:</b> you need two things at once \u2014 instant lookup and instant reordering. A dict gives lookup; a doubly linked list gives reordering. Store the node itself as the dict's value so you can unlink it without searching. Every access moves its node to the front; eviction always takes from the back.",
+    code:`class Node:
+    def __init__(self, key=0, val=0):
+        self.key, self.val = key, val
+        self.prev = self.next = None
+
+class LRUCache:
+    def __init__(self, capacity):
+        self.capacity = capacity
+        self.map = {}                    # key -> Node
+        self.head, self.tail = Node(), Node()   # sentinels
+        self.head.next, self.tail.prev = self.tail, self.head
+
+    def _remove(self, node):
+        node.prev.next, node.next.prev = node.next, node.prev
+
+    def _add_front(self, node):
+        node.next, node.prev = self.head.next, self.head
+        self.head.next.prev = node
+        self.head.next = node
+
+    def get(self, key):
+        if key not in self.map: return -1
+        node = self.map[key]
+        self._remove(node); self._add_front(node)   # mark as newest
+        return node.val
+
+    def put(self, key, value):
+        if key in self.map: self._remove(self.map[key])
+        node = Node(key, value)
+        self.map[key] = node
+        self._add_front(node)
+        if len(self.map) > self.capacity:
+            lru = self.tail.prev
+            self._remove(lru)
+            del self.map[lru.key]        # don't forget this line!`, frames});
+})();
+
+/* ---- 11. Binary search ---- */
+(function(){
+  const ts=[10,20,30,40,50], vals=["v1","v2","v3","v4","v5"], target=35, frames=[];
+  let lo=0, hi=ts.length-1, ans=-1;
+  frames.push({html: cells(ts,{},{}) + panels(box("looking for",[{text:"latest timestamp \u2264 "+target}])),
+    narr:"A device reported at these timestamps. We want its value at time <b>"+target+"</b> \u2014 meaning the <b>latest reading at or before</b> 35. Scanning all of them is O(n); since the list is sorted, we can do far better."});
+  while(lo<=hi){
+    const mid=Math.floor((lo+hi)/2);
+    const marks={}; for(let i=lo;i<=hi;i++) marks[i]="win"; marks[mid]="cur";
+    frames.push({html: cells(ts,marks,{lo:lo,mid:mid,hi:hi}) + panels(box("best so far",[{text:ans>=0?ts[ans]+" ("+vals[ans]+")":"none"}])),
+      narr:"Search range is indexes "+lo+"\u2013"+hi+". Check the <b>middle</b>: timestamp <code>"+ts[mid]+"</code>. Is it \u2264 "+target+"?"});
+    if(ts[mid]<=target){
+      ans=mid; lo=mid+1;
+      frames.push({html: cells(ts,{...marks,[mid]:"hit"},{lo:lo,hi:hi}) + panels(box("best so far",[{text:ts[ans]+" ("+vals[ans]+")",isNew:true}])),
+        narr:"Yes \u2014 <code>"+ts[mid]+"</code> is a valid candidate, so remember it. But something <b>later</b> might also qualify, so discard the left half and search right."});
+    } else {
+      hi=mid-1;
+      frames.push({html: cells(ts,{...marks,[mid]:"bad"},{lo:lo,hi:hi}) + panels(box("best so far",[{text:ans>=0?ts[ans]+" ("+vals[ans]+")":"none"}])),
+        narr:"No \u2014 <code>"+ts[mid]+"</code> is <b>after</b> "+target+", so it and everything right of it are too late. Discard the right half."});
+    }
+  }
+  frames.push({html: cells(ts,{[ans]:"hit"},{}) + panels(box("answer",[{text:vals[ans]+" (at t="+ts[ans]+")",isNew:true}])),
+    narr:"Answer: <code>"+vals[ans]+"</code>. Each check threw away <b>half</b> the remaining data \u2014 that's <b>O(log n)</b>. A million readings would take about 20 checks."});
+  VIS.push({id:"binsearch", name:"Binary Search", title:"Binary Search — time-based key-value store",
+    sub:"Find the latest reading at or before a given time.",
+    idea:"<b>Core idea:</b> on sorted data, checking the middle lets you throw away half the possibilities every time. For \"latest one at or before T,\" record a match as your best answer and keep searching right for a later one. This is exactly how a telemetry store answers \"what was this vehicle's state at 3pm.\"",
+    code:`from collections import defaultdict
+import bisect
+
+class TimeMap:
+    def __init__(self):
+        self.store = defaultdict(list)     # key -> [(timestamp, value)]
+
+    def set(self, key, value, timestamp):
+        self.store[key].append((timestamp, value))   # already in order
+
+    def get(self, key, timestamp):
+        entries = self.store.get(key)
+        if not entries: return ""
+        i = bisect.bisect_right(entries, (timestamp, chr(0x10FFFF)))
+        return entries[i - 1][1] if i else ""`, frames});
+})();
+
+/* ---- 12. Token bucket ---- */
+(function(){
+  const cap=2, rate=1, frames=[]; let tokens=cap, last=0;
+  function draw(ts, verdict){
+    let h='<div class="bucket"><div class="bfill" style="height:'+(Math.max(0,tokens)/cap*100)+'%"></div></div>';
+    h+='<div class="btok">'+tokens.toFixed(2)+' / '+cap+' tokens &nbsp;\u00B7&nbsp; time '+ts+'s</div>';
+    if(verdict) h+='<div style="text-align:center;margin-top:8px"><span class="kv" style="display:inline-block;background:'+(verdict==="ALLOWED"?"var(--charge-soft);color:#0B6B48":"var(--dead-soft);color:#8E2F1C")+'">'+verdict+'</span></div>';
+    return h;
+  }
+  frames.push({html:draw(0,null),
+    narr:"A <b>rate limiter</b> stops clients hammering your API. Picture a bucket holding <b>"+cap+"</b> tokens that refills at <b>"+rate+" token per second</b>. Every request must spend one token."});
+  function req(ts){
+    const elapsed=ts-last;
+    if(elapsed>0){ tokens=Math.min(cap, tokens+elapsed*rate); last=ts;
+      frames.push({html:draw(ts,null), narr:"Request at <b>t="+ts+"s</b>. First, refill: <code>"+elapsed+"s \u00D7 "+rate+"</code> = "+(elapsed*rate)+" tokens added (capped at "+cap+"). We compute this <b>lazily</b> on each call \u2014 no background timer needed."});
+    }
+    if(tokens>=1){ tokens-=1;
+      frames.push({html:draw(ts,"ALLOWED"), narr:"There's at least 1 token, so spend it and <b>allow</b> the request. "+tokens.toFixed(2)+" left."});
+    } else {
+      frames.push({html:draw(ts,"REJECTED"), narr:"Bucket is empty \u2014 <b>reject</b> the request (HTTP 429). The client must wait for it to refill."});
+    }
+  }
+  req(0); req(0); req(0); req(1); req(1);
+  frames.push({html:draw(1,null),
+    narr:"Notice the behavior: bursts of up to <b>"+cap+"</b> are fine, but the long-run average is held to <b>"+rate+"/second</b>. That burst allowance is exactly why the token bucket is preferred over a fixed counter."});
+  VIS.push({id:"bucket", name:"Token Bucket", title:"Token Bucket — rate limiting an API",
+    sub:"Allow bursts, but cap the long-run rate.",
+    idea:"<b>Core idea:</b> don't run a timer refilling tokens in the background. Instead, on each request compute how much time passed and add that many tokens (capped). One arithmetic step, constant memory per client. In a distributed system this moves to Redis with an atomic script, because separate servers would otherwise race.",
+    code:`class RateLimiter:
+    def __init__(self, capacity, refill_rate):
+        self.capacity = capacity
+        self.refill_rate = refill_rate
+        self.tokens = float(capacity)
+        self.last_ts = 0.0
+
+    def allow(self, timestamp):
+        elapsed = timestamp - self.last_ts
+        if elapsed > 0:                       # lazy refill
+            self.tokens = min(self.capacity,
+                              self.tokens + elapsed * self.refill_rate)
+            self.last_ts = timestamp
+        if self.tokens >= 1:
+            self.tokens -= 1
+            return True
+        return False`, frames});
+})();
+
+/* ============ player ============ */
+let cur = 0, step = 0, playing = null;
+
+
+/* per-card viewer + mapping (ref entry id -> visual id) */
+const VIZ_MAP = {
+  "hash-map-pattern":"two-sum", "sliding-window":"window", "two-pointers":"twoptr",
+  "binary-search":"binsearch", "monotonic-stack":"monostack", "prefix-sums":"prefix",
+  "interval-merge":"intervals", "heapq":"heap", "topo-sort":"topo", "bfs-dfs":"bfs",
+  "ordereddict":"lru"
+};
+let vizState = {};
+let vizPlayTimer = null;
+function vizPlayStop(){ if(vizPlayTimer){ clearInterval(vizPlayTimer); vizPlayTimer=null; } }
+
+function vizRender(refId, vis){
+  const box = document.getElementById("viz-" + refId);
+  if(!box) return;
+  const st = vizState[vis.id] || 0;
+  const f = vis.frames[Math.min(st, vis.frames.length - 1)];
+  box.innerHTML =
+    '<div class="stage">' + f.html + '</div>' +
+    '<div class="narr">' + f.narr + '</div>' +
+    '<div class="controls">' +
+      '<button id="vz-prev-' + refId + '">\u2190 Back</button>' +
+      '<button class="btn-play" id="vz-play-' + refId + '">' + (vizPlayTimer ? "\u275A\u275A Pause" : "\u25B6 Play") + '</button>' +
+      '<button id="vz-next-' + refId + '">Next \u2192</button>' +
+      '<button id="vz-restart-' + refId + '">Restart</button>' +
+      '<span class="step-count">step ' + (st + 1) + ' / ' + vis.frames.length + '</span>' +
+    '</div>' +
+    '<div class="track"><div class="track-fill" style="width:' + ((st + 1) / vis.frames.length * 100).toFixed(1) + '%"></div></div>' +
+    '<details class="code"><summary>Show the code this is running</summary><pre>' + esc(vis.code) + '</pre></details>';
+  document.getElementById("vz-prev-" + refId).disabled = st === 0;
+  document.getElementById("vz-next-" + refId).disabled = st >= vis.frames.length - 1;
+  document.getElementById("vz-prev-" + refId).addEventListener("click", () => { vizPlayStop(); vizState[vis.id] = Math.max(0, st - 1); vizRender(refId, vis); });
+  document.getElementById("vz-next-" + refId).addEventListener("click", () => { vizPlayStop(); vizState[vis.id] = Math.min(vis.frames.length - 1, st + 1); vizRender(refId, vis); });
+  document.getElementById("vz-restart-" + refId).addEventListener("click", () => { vizPlayStop(); vizState[vis.id] = 0; vizRender(refId, vis); });
+  document.getElementById("vz-play-" + refId).addEventListener("click", () => {
+    if(vizPlayTimer){ vizPlayStop(); vizRender(refId, vis); return; }
+    if(vizState[vis.id] >= vis.frames.length - 1) vizState[vis.id] = 0;
+    vizPlayTimer = setInterval(() => {
+      if(vizState[vis.id] < vis.frames.length - 1){ vizState[vis.id]++; vizRender(refId, vis); }
+      else { vizPlayStop(); vizRender(refId, vis); }
+    }, 1100);
+    vizRender(refId, vis);
+  });
+}
+
+
 /* ================= REFERENCE UI ================= */
 let refQuery = "";
 let refRenderToken = 0;   // bumped on every re-render; guards stale async writes
@@ -1981,6 +2711,8 @@ function refCard(e){
   const probs=(REF_LINKS[e.id]||[]).map(pid=>{ const p=byId(pid); return p?'<button class="ref-link" data-pid="'+pid+'">'+esc(p.name)+'</button>':""; }).join("");
   const sol=REF_SOLUTIONS[e.id];
   const trad=REF_TRAD[e.id]||{};
+  const vizId=VIZ_MAP[e.id];
+  const vis=vizId?VIS.find(v=>v.id===vizId):null;
   return '<div class="ref-card">'+
     '<div class="ref-name">'+esc(e.name)+
       (e.tags||[]).map(t=>'<span class="p-tag">'+esc(t)+'</span>').join("")+'</div>'+
@@ -1994,6 +2726,7 @@ function refCard(e){
       '<textarea class="editor rp-ed" id="rp-ed-'+e.id+'" spellcheck="false">'+esc(e.starter)+'</textarea>'+
       '<div class="actions"><button class="btn-run" id="rp-'+e.id+'">Run practice</button></div>'+
       '<div class="results" id="rp-res-'+e.id+'"></div>'+
+      (vis?'<details class="viz-d"><summary>\u25B6 Watch it run \u2014 visual guide</summary><div id="viz-'+e.id+'"></div></details>':'')+
       (sol?'<details><summary>Show solution &amp; explanation</summary><div class="body">'+
         '<div class="sol-label">'+(trad.codeLabel||"Idiomatic")+'</div><pre>'+esc(sol.code)+'</pre>'+
         (trad.trad?'<div class="sol-label">'+(trad.tradLabel||"Traditional")+'</div><pre>'+esc(trad.trad)+'</pre>':'')+
@@ -2012,7 +2745,27 @@ function renderReference(){
     if(q && !hay.includes(q)) return;
     (byCat[e.cat]=byCat[e.cat]||[]).push(e);
   });
-  let html='<div class="p-title">Python &amp; DS&amp;A Reference</div>'+
+  let html='<details class="primer"><summary>Start here: the words you need first (5-minute primer)</summary><div class="body">'+
+    '<h4>Big-O \u2014 how we measure speed</h4>'+
+    '<p>Big-O describes how much slower something gets as the input grows. <code>O(n)</code> means "look at each item once" \u2014 1,000 items takes 1,000 steps. <code>O(n\u00B2)</code> means "for each item, look at every item again" \u2014 1,000 items takes a million steps. <code>O(log n)</code> means "cut the problem in half each time" \u2014 a million items takes about 20 steps. In interviews, going from O(n\u00B2) to O(n) is usually the whole point of the question.</p>'+
+    '<h4>Array / list</h4>'+
+    '<p>Items in a row, numbered from 0. Reading position 5 is instant. Searching for a value means scanning \u2014 that\u2019s the slow part we usually optimize away.</p>'+
+    '<h4>Hash map (Python: <code>dict</code>)</h4>'+
+    '<p>A lookup table of key \u2192 value. The magic property: checking "is this key here?" is instant no matter how big it gets. Almost every "make it O(n)" trick is really "use a dict to remember what you\u2019ve already seen."</p>'+
+    '<h4>Set</h4>'+
+    '<p>A dict with keys only, no values. Use it for instant "have I seen this?" checks.</p>'+
+    '<h4>Stack</h4>'+
+    '<p>Last in, first out \u2014 like a stack of plates. You add and remove from the top only. Great for "match the most recent thing" problems, like brackets.</p>'+
+    '<h4>Queue</h4>'+
+    '<p>First in, first out \u2014 like a line at a counter. Used for exploring outward evenly, layer by layer.</p>'+
+    '<h4>Heap (priority queue)</h4>'+
+    '<p>A pile where the smallest item is always instantly available at the top, without keeping everything fully sorted. Use it when you repeatedly need "the smallest / next thing to expire."</p>'+
+    '<h4>Pointer</h4>'+
+    '<p>Just a variable holding a position number in an array. "Two pointers" means tracking two positions at once and moving them cleverly instead of using nested loops.</p>'+
+    '<h4>Node and linked list</h4>'+
+    '<p>A node is a small box holding a value plus arrows to its neighbors. A linked list is a chain of them. Rearranging a chain is instant (rewire two arrows) \u2014 that\u2019s why the LRU cache uses one.</p>'+
+  '</details>'+
+  '<div class="p-title">Python &amp; DS&amp;A Reference</div>'+
     '<div class="hintline" style="margin:6px 0 10px">Every term used in these problems: what it is, when to reach for it, how to write it \u2014 with a quick practice to run. Type to filter.</div>'+
     '<input type="text" id="refSearch" class="ref-search" placeholder="Search terms \u2014 e.g. enumerate, heap, sliding window\u2026" value="'+esc(refQuery)+'">'+
     '<div class="actions" style="margin:2px 0 4px"><button id="refBack">\u2190 Back to problems</button></div>';
@@ -2040,6 +2793,13 @@ function renderReference(){
   });
   panel.querySelectorAll(".ref-link").forEach(btn=>{
     btn.addEventListener("click",()=>openProblem(btn.dataset.pid));
+  });
+  REFERENCE.forEach(e=>{
+    const vizId=VIZ_MAP[e.id];
+    if(vizId){
+      const vis=VIS.find(v=>v.id===vizId);
+      if(vis) vizRender(e.id,vis);
+    }
   });
 }
 
@@ -2364,6 +3124,27 @@ document.getElementById("startTimer").addEventListener("click",e=>{
   if(timerId){ clearInterval(timerId); timerId=null; remaining=45*60; paintTimer(); e.target.textContent="Start 45-min timer"; return; }
   e.target.textContent="Stop timer";
   timerId=setInterval(()=>{ remaining--; paintTimer(); },1000);
+});
+
+/* Tab in ANY textarea inserts 4 spaces (multi-line selections indent every line).
+   Fires an input event afterwards so save/autosave handlers still run. */
+document.addEventListener("keydown",e=>{
+  if(e.key!=="Tab" || e.shiftKey || e.target.tagName!=="TEXTAREA") return;
+  e.preventDefault();
+  const ta=e.target, s=ta.selectionStart, en=ta.selectionEnd, val=ta.value;
+  let newVal, cursor;
+  if(en>s && val.slice(s,en).indexOf("\n")!==-1){
+    const before=val.slice(0,s), sel=val.slice(s,en), after=val.slice(en);
+    const indented=sel.split("\n").map(l=>"    "+l).join("\n");
+    newVal=before+indented+after;
+    cursor=s+indented.length;
+  } else {
+    newVal=val.slice(0,s)+"    "+val.slice(en);
+    cursor=s+4;
+  }
+  ta.value=newVal;
+  ta.selectionStart=ta.selectionEnd=cursor;
+  ta.dispatchEvent(new Event("input",{bubbles:true}));
 });
 
 paintTimer();
