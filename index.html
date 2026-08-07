@@ -332,14 +332,9 @@
         <label for="authPass2">Confirm password</label>
         <input type="password" id="authPass2" autocomplete="new-password">
       </div>
-      <label class="auth-import" id="authImportRow" style="display:none">
-        <input type="checkbox" id="authImport" checked>
-        <span>Import existing progress saved in this browser</span>
-      </label>
-      <div class="auth-profiles" id="authProfiles"></div>
       <div class="status auth-err" id="authErr"></div>
       <button class="btn-run auth-submit" id="authSubmit">Log in</button>
-      <div class="hintline auth-note">Profiles are stored locally in this browser (per device) and password-protected \u2014 they keep each user\u2019s progress separate on shared devices. They are not server accounts.</div>
+      <div class="hintline auth-note">Accounts are stored in a PostgreSQL database; passwords are hashed with bcrypt on the server. Your progress follows your account on any device.</div>
     </div>
   </div>
 </div>
@@ -1569,16 +1564,31 @@ const BEHAV_PLAN = [
 
 /* ================= STATE ================= */
 const KEY = "gm-practice-lab-v2";
-/* Active profile session (username, or null when logged out). */
+/* Active profile session (username + API token, or null when logged out). */
 let sessionUser = null;
+let sessionToken = null;
 
-/* localStorage-backed storage (drop-in for the preview sandbox API).
-   Every key is namespaced by the active profile ("usr:<name>:<key>"),
-   so each user's data is fully isolated from every other user. */
+/* PostgreSQL-backed storage. Every read/write goes through the API
+   (GET/PUT /api/state/<domain>), isolated per user server-side.
+   Domain mapping keeps the rest of the app untouched. */
 const storage = {
-  _p(){ return sessionUser ? "usr:"+sessionUser+":" : "anon:"; },
-  async set(k, v){ try{ localStorage.setItem(this._p()+k, v); return true; }catch(e){ return false; } },
-  async get(k){ try{ const v=localStorage.getItem(this._p()+k); return v===null?null:{value:v}; }catch(e){ return null; } }
+  _d(k){ const m={"gm-practice-lab-v2":"problems","coding-prep-tracker-v1":"tracker","coding-prep-design-v1":"design","coding-prep-behav-v1":"behav"}; return m[k]||k; },
+  async set(k, v){
+    if(!sessionToken) return false;
+    try{
+      const r=await fetch("/api/state/"+this._d(k),{method:"PUT",headers:{"Content-Type":"application/json","Authorization":"Bearer "+sessionToken},body:JSON.stringify({data:JSON.parse(v)})});
+      return r.ok;
+    }catch(e){ return false; }
+  },
+  async get(k){
+    if(!sessionToken) return null;
+    try{
+      const r=await fetch("/api/state/"+this._d(k),{headers:{"Authorization":"Bearer "+sessionToken}});
+      if(!r.ok) return null;
+      const d=await r.json();
+      return (d.data===null||d.data===undefined) ? null : {value: JSON.stringify(d.data)};
+    }catch(e){ return null; }
+  }
 };
 let state = { code:{}, solved:{}, overrides:{}, custom:[], deleted:[] };
 let current = null, editing = false, pyodide = null, pyLoading = false;
@@ -1592,11 +1602,22 @@ function byId(id){ return problems().find(p => p.id === id); }
 function isCustom(id){ return state.custom.some(p => p.id === id); }
 function isEdited(id){ return !!state.overrides[id]; }
 
-async function save(){
-  try{
-    const r = await storage.set(KEY, JSON.stringify(state));
-    setStatus(r ? "Saved \u2713" : "Save failed — changes may not persist.");
-  }catch(e){ setStatus("Save failed — changes may not persist."); }
+/* Coalescing save chain: all saves serialize through one promise queue and
+   always write the LATEST state snapshot, so a slow earlier request can never
+   overwrite a newer one (this race previously lost solved marks). */
+let saveChain = Promise.resolve();
+let saveQueued = false;
+function save(){
+  saveQueued = true;
+  saveChain = saveChain.then(async () => {
+    if(!saveQueued) return;
+    saveQueued = false;
+    try{
+      const r = await storage.set(KEY, JSON.stringify(state));
+      setStatus(r ? "Saved \u2713" : "Save failed \u2014 changes may not persist.");
+    }catch(e){ setStatus("Save failed \u2014 changes may not persist."); }
+  });
+  return saveChain;
 }
 async function load(){
   try{
@@ -1926,7 +1947,7 @@ _out
     if(r.res.stdout) html+='<div class="case">stdout: '+esc(r.res.stdout)+'</div>';
   });
   out.innerHTML=html;
-  if(allPass){ state.solved[p.id]=true; save(); renderList(); }
+  if(allPass){ state.solved[p.id]=true; await save(); renderList(); }
   setStatus(""); btn.disabled=false;
 }
 
@@ -3198,39 +3219,21 @@ document.addEventListener("keydown",e=>{
   ta.dispatchEvent(new Event("input",{bubbles:true}));
 });
 
-/* ================= AUTH (multi-user profiles) ================= */
-/* Threat model: profiles live in this browser/device. A password-protected
-   profile keeps OTHER USERS on the same device out of your progress. This is
-   NOT server-grade auth — anyone with devtools access to the device could
-   bypass it. Cross-device accounts would need a real backend. */
-const PROFILE_REG="coding-prep-profiles-v1";
-const AUTH_LOCK_KEY="coding-prep-authlock-v1";
-const SECURE_CTX_MSG="Password protection needs HTTPS or localhost \u2014 open the app via https or http://localhost.";
+/* ================= AUTH (PostgreSQL-backed accounts) ================= */
+/* Accounts live in the PostgreSQL database; passwords are hashed with bcrypt
+   on the server. Sessions are opaque, revocable bearer tokens. */
 const LEGACY_KEYS=["gm-practice-lab-v2","coding-prep-tracker-v1","coding-prep-design-v1","coding-prep-behav-v1"];
 
-/* Constant-time string compare — avoids timing side-channels on hash checks. */
-function ctEqual(a,b){
-  if(typeof a!=="string" || typeof b!=="string" || a.length!==b.length) return false;
-  let d=0;
-  for(let i=0;i<a.length;i++) d|=a.charCodeAt(i)^b.charCodeAt(i);
-  return d===0;
+async function api(path, opts){
+  opts=opts||{};
+  const headers=Object.assign({"Content-Type":"application/json"}, opts.headers||{});
+  if(sessionToken) headers["Authorization"]="Bearer "+sessionToken;
+  const r=await fetch("/api"+path,{method:opts.method||"GET",headers:headers,body:opts.body});
+  let data=null;
+  try{ data=await r.json(); }catch(e){}
+  if(!r.ok) throw new Error((data&&data.detail)||"Request failed ("+r.status+")");
+  return data;
 }
-/* Persistent brute-force throttle — survives reloads (stored outside the per-user namespace). */
-function loadAuthLock(){ try{ const v=localStorage.getItem(AUTH_LOCK_KEY); return v?JSON.parse(v):null; }catch(e){ return null; } }
-function saveAuthLock(l){ try{ if(l) localStorage.setItem(AUTH_LOCK_KEY,JSON.stringify(l)); else localStorage.removeItem(AUTH_LOCK_KEY); }catch(e){} }
-
-async function pbkdf2Hex(password, saltHex, iterations){
-  if(!crypto.subtle) throw new Error("no-secure-context");   // fail closed — never store a weak hash
-  const salt=Uint8Array.from(saltHex.match(/.{2}/g).map(h=>parseInt(h,16)));
-  const key=await crypto.subtle.importKey("raw",new TextEncoder().encode(password),"PBKDF2",false,["deriveBits"]);
-  const bits=await crypto.subtle.deriveBits({name:"PBKDF2",salt:salt,iterations:iterations,hash:"SHA-256"},key,256);
-  return Array.from(new Uint8Array(bits)).map(b=>b.toString(16).padStart(2,"0")).join("");
-}
-function randHex(n){ const a=new Uint8Array(n); crypto.getRandomValues(a); return Array.from(a).map(b=>b.toString(16).padStart(2,"0")).join(""); }
-function getProfiles(){ try{ return JSON.parse(localStorage.getItem(PROFILE_REG))||{}; }catch(e){ return {}; } }
-function saveProfiles(p){ try{ localStorage.setItem(PROFILE_REG,JSON.stringify(p)); }catch(e){} }
-function listProfiles(){ return Object.keys(getProfiles()).sort(); }
-function hasLegacy(){ return LEGACY_KEYS.some(k=>localStorage.getItem(k)!==null); }
 
 function showAuth(){ document.getElementById("authOverlay").classList.remove("auth-hidden"); }
 function hideAuth(){ document.getElementById("authOverlay").classList.add("auth-hidden"); }
@@ -3240,101 +3243,90 @@ function setAuthUI(mode){
   document.getElementById("authMode-register").classList.toggle("active",mode==="register");
   document.getElementById("authPass2row").style.display=mode==="register"?"block":"none";
   document.getElementById("authSubmit").textContent=mode==="register"?"Create profile":"Log in";
-  document.getElementById("authImportRow").style.display=(mode==="register"&&hasLegacy())?"flex":"none";
   document.getElementById("authErr").textContent="";
-}
-function renderProfiles(){
-  const el=document.getElementById("authProfiles");
-  const users=listProfiles();
-  if(!users.length){ el.innerHTML=""; return; }
-  el.innerHTML='<span class="hintline" style="margin-right:6px">On this device:</span>'+
-    users.map(u=>'<button class="ref-link" data-u="'+esc(u)+'">'+esc(u)+'</button>').join("");
-  el.querySelectorAll("[data-u]").forEach(b=>b.addEventListener("click",()=>{
-    document.getElementById("authUser").value=b.dataset.u;
-    document.getElementById("authPass").focus();
-  }));
-}
-function importLegacy(user){
-  LEGACY_KEYS.forEach(k=>{
-    const v=localStorage.getItem(k);
-    if(v!==null) localStorage.setItem("usr:"+user+":"+k,v);
-  });
-  LEGACY_KEYS.forEach(k=>localStorage.removeItem(k));
 }
 async function authSubmit(){
   const mode=document.getElementById("authMode-register").classList.contains("active")?"register":"login";
   const user=document.getElementById("authUser").value.trim().toLowerCase();
   const pass=document.getElementById("authPass").value;
   const err=document.getElementById("authErr");
+  if(user.includes("@")){ err.textContent="That\u2019s an email \u2014 this app uses a username. Pick one like wei8973 (letters/numbers/_/- only)."; return; }
   if(!/^[a-z0-9_-]{3,24}$/.test(user)){ err.textContent="Username: 3\u201324 characters, letters/numbers/_/-."; return; }
   if(pass.length<6){ err.textContent="Password must be at least 6 characters."; return; }
-  const profiles=getProfiles();
-  if(mode==="register"){
-    if(profiles[user]){ err.textContent="Username already exists \u2014 log in instead."; return; }
-    if(document.getElementById("authPass2").value!==pass){ err.textContent="Passwords don\u2019t match."; return; }
-    const salt=randHex(16), iters=100000;
-    let hash;
-    try{ hash=await pbkdf2Hex(pass,salt,iters); }
-    catch(e){ err.textContent=SECURE_CTX_MSG; return; }
-    profiles[user]={salt:salt,hash:hash,iters:iters,created:Date.now()};
-    saveProfiles(profiles);
-    if(document.getElementById("authImport").checked) importLegacy(user);
-    enterSession(user);
-  } else {
-    const rec=profiles[user];
-    if(!rec){ err.textContent="Unknown username."; return; }
-    let lock=loadAuthLock();
-    if(lock && Date.now()>=lock.until){ lock=null; saveAuthLock(null); }
-    if(lock && lock.user===user && Date.now()<lock.until){
-      err.textContent="Too many failed attempts \u2014 try again in "+Math.ceil((lock.until-Date.now())/1000)+"s.";
-      return;
-    }
-    let hash;
-    try{ hash=await pbkdf2Hex(pass,rec.salt,rec.iters); }
-    catch(e){ err.textContent=SECURE_CTX_MSG; return; }
-    if(!ctEqual(hash,rec.hash)){
-      if(!lock || lock.user!==user) lock={user:user,fails:0,until:0};
-      lock.fails++;
-      if(lock.fails>=5){ lock.until=Date.now()+30000; lock.fails=0; }
-      saveAuthLock(lock);
-      err.textContent="Wrong password.";
-      return;
-    }
-    saveAuthLock(null);
-    enterSession(user);
+  if(new TextEncoder().encode(pass).length>72){ err.textContent="Password too long (max 72 bytes)."; return; }
+  if(mode==="register" && document.getElementById("authPass2").value!==pass){ err.textContent="Passwords don\u2019t match."; return; }
+  err.textContent="";
+  try{
+    const d=await api("/"+mode,{method:"POST",body:JSON.stringify({username:user,password:pass})});
+    enterSession(d.user,d.token);
+  }catch(e){
+    err.textContent=e.message;
   }
 }
-function enterSession(user){
-  sessionUser=user;
-  try{ sessionStorage.setItem("coding-prep-session",user); }catch(e){}
+function enterSession(user, token){
+  sessionUser=user; sessionToken=token;
+  try{ sessionStorage.setItem("coding-prep-session",JSON.stringify({user:user,token:token})); }catch(e){}
   document.getElementById("authUser").value="";
   document.getElementById("authPass").value="";
   document.getElementById("authPass2").value="";
   hideAuth();
   startApp();
 }
-function logout(){
-  sessionUser=null;
+async function logout(){
+  const tok=sessionToken;
+  sessionUser=null; sessionToken=null;
   try{ sessionStorage.removeItem("coding-prep-session"); }catch(e){}
+  if(tok){ try{ await fetch("/api/logout",{method:"POST",headers:{"Authorization":"Bearer "+tok}}); }catch(e){} }
   /* wipe in-memory state so the next user starts clean */
   state={code:{},solved:{},overrides:{},custom:[],deleted:[]};
   trackerState={startDate:null,checked:{}};
   designState={steps:{}};
   behavState={drafts:{},practiced:{}};
   vizPlayStop();
-  renderProfiles();
   setAuthUI("login");
   showAuth();
 }
-function startApp(){
+/* One-time upload of any progress saved by the old localStorage-only version.
+   The localStorage copy is removed ONLY when we KNOW the server has this data
+   (either it already exists there, or our upload succeeded). A failed GET/PUT
+   never triggers deletion — the local copy stays for a retry on next login. */
+async function migrateLegacy(){
+  for(const k of LEGACY_KEYS){
+    const raw=localStorage.getItem(k);
+    if(raw===null) continue;
+    let existing=null, err=false;
+    try{
+      const r=await fetch("/api/state/"+storage._d(k),{headers:{"Authorization":"Bearer "+sessionToken}});
+      if(!r.ok){ err=true; }
+      else{ const d=await r.json(); existing=d.data; }
+    }catch(e){ err=true; }
+    if(err) continue;                             // can't verify server state — keep local copy
+    if(existing===null){
+      const ok=await storage.set(k,raw);          // server has nothing for this user yet
+      if(!ok) continue;                           // upload failed — keep the local copy
+    }
+    localStorage.removeItem(k);
+  }
+}
+async function startApp(){
   document.getElementById("userChip").textContent="\uD83D\uDC64 "+sessionUser;
+  await migrateLegacy();
   load().then(()=>{ current=problems()[0].id; renderList(); renderPanel(); });
 }
-function initAuth(){
-  let u=null;
-  try{ u=sessionStorage.getItem("coding-prep-session"); }catch(e){}
-  if(u && getProfiles()[u]){ sessionUser=u; hideAuth(); startApp(); return; }
-  renderProfiles();
+async function initAuth(){
+  let sess=null;
+  try{ sess=JSON.parse(sessionStorage.getItem("coding-prep-session")||"null"); }catch(e){}
+  if(sess && sess.token){
+    sessionUser=sess.user; sessionToken=sess.token;   // set first so /api/me carries the token
+    try{
+      const me=await api("/me");
+      sessionUser=me.username;                        // server is the source of truth
+      hideAuth(); startApp(); return;
+    }catch(e){
+      sessionUser=null; sessionToken=null;
+      try{ sessionStorage.removeItem("coding-prep-session"); }catch(e2){}
+    }
+  }
   setAuthUI("login");
   showAuth();
 }
