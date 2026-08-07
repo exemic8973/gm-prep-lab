@@ -48,7 +48,9 @@ class StatePayload(BaseModel):
 
 def db():
     try:
-        return psycopg.connect(DATABASE_URL)
+        # prepare_threshold=None: disables server-side prepared statements,
+        # required when running through a pgbouncer/Neon pooled connection.
+        return psycopg.connect(DATABASE_URL, prepare_threshold=None, connect_timeout=10)
     except Exception:
         raise HTTPException(503, "Database unavailable")
 
