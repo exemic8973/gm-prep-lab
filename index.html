@@ -56,6 +56,20 @@
   textarea.editor{width:100%;min-height:270px;background:var(--editor-bg);color:var(--editor-ink);font-family:'IBM Plex Mono',monospace;font-size:13px;line-height:1.6;padding:12px 14px;border:none;border-radius:8px;resize:vertical;tab-size:4;margin-top:10px}
   textarea.editor:focus{outline:2px solid var(--charge);outline-offset:2px}
 
+  /* Python syntax highlighting — overlay technique: transparent-text textarea
+     on top of a tokenized <pre>, fully offline, no CDN dependency */
+  .ed-wrap{position:relative}
+  .ed-wrap textarea{position:relative;z-index:1;background:transparent;color:transparent;-webkit-text-fill-color:transparent;caret-color:var(--editor-ink)}
+  .ed-highlight{position:absolute;inset:0;z-index:0;margin:0;pointer-events:none;overflow:hidden;white-space:pre;word-break:normal;overflow-wrap:normal;background:var(--editor-bg);color:var(--editor-ink)}
+  .ed-wrap textarea,.ed-highlight{white-space:pre;word-break:normal;overflow-wrap:normal}
+  .tok-c{color:#7F97A4;font-style:italic}
+  .tok-s{color:#A8C97F}
+  .tok-d{color:#C586C0}
+  .tok-n{color:#B5CEA8}
+  .tok-k{color:#C586C0;font-weight:600}
+  .tok-f{color:#61AFEF}
+  .tok-b{color:#E5C07B}
+
   .actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;align-items:center}
   button{font-family:'IBM Plex Sans',sans-serif;font-size:13px;font-weight:600;padding:8px 13px;border-radius:7px;border:1px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer}
   button:hover{border-color:var(--ink)}
@@ -1716,6 +1730,7 @@ function renderPanel(){
   const ed=document.getElementById("editor");
   ed.value=saved;
   ed.addEventListener("input",()=>{ state.code[p.id]=ed.value; save(); });
+  enhanceEditor(ed);
   document.getElementById("runBtn").addEventListener("click",()=>runTests(p));
   document.getElementById("resetCode").addEventListener("click",()=>{
     if(!confirm("Reset your code to the starter template?")) return;
@@ -2860,6 +2875,8 @@ function renderReference(){
   search.addEventListener("input",()=>{ refQuery=search.value; renderReference(); });
   search.focus();
   REFERENCE.forEach(e=>{
+    const rp=document.getElementById("rp-ed-"+e.id);
+    if(rp) enhanceEditor(rp);
     const btn=document.getElementById("rp-"+e.id);
     if(btn) btn.addEventListener("click",()=>runPracticeCard(e));
   });
@@ -3198,25 +3215,121 @@ document.getElementById("startTimer").addEventListener("click",e=>{
   timerId=setInterval(()=>{ remaining--; paintTimer(); },1000);
 });
 
-/* Tab in ANY textarea inserts 4 spaces (multi-line selections indent every line).
-   Fires an input event afterwards so save/autosave handlers still run. */
-document.addEventListener("keydown",e=>{
-  if(e.key!=="Tab" || e.shiftKey || e.target.tagName!=="TEXTAREA") return;
-  e.preventDefault();
-  const ta=e.target, s=ta.selectionStart, en=ta.selectionEnd, val=ta.value;
-  let newVal, cursor;
-  if(en>s && val.slice(s,en).indexOf("\n")!==-1){
-    const before=val.slice(0,s), sel=val.slice(s,en), after=val.slice(en);
-    const indented=sel.split("\n").map(l=>"    "+l).join("\n");
-    newVal=before+indented+after;
-    cursor=s+indented.length;
-  } else {
-    newVal=val.slice(0,s)+"    "+val.slice(en);
-    cursor=s+4;
+/* ================= PYTHON SYNTAX HIGHLIGHTING ================= */
+const PY_KEYWORDS=["and","as","assert","async","await","break","class","continue","def","del","elif","else","except","finally","for","from","global","if","import","in","is","lambda","nonlocal","not","or","pass","raise","return","try","while","with","yield","True","False","None"];
+const PY_BUILTINS=["print","len","range","enumerate","zip","map","filter","sorted","sum","min","max","abs","int","str","float","bool","list","dict","set","tuple","repr","type","isinstance","getattr","setattr","round","any","all","reversed","open","input","format","pow","ord","chr","hex","oct","bin","id","hash","callable","iter","next","super","slice","bytes","bytearray","object","frozenset","Exception","ValueError","TypeError","KeyError","IndexError","AttributeError","ImportError","NameError","ZeroDivisionError","StopIteration","RuntimeError","NotImplementedError","FileNotFoundError","Counter","defaultdict","OrderedDict","deque","namedtuple","partial","reduce","accumulate","combinations","permutations","product","groupby","chain","Path"];
+const PY_TOKEN_RE=new RegExp(
+  "(#[^\\n]*)"+                                   // 1 comment
+  "|(\"\"\"[\\s\\S]*?\"\"\"|'''[\\s\\S]*?''')"+   // 2 triple-quoted string
+  "|(\"(?:[^\"\\\\\\n]|\\\\.)*\"|'(?:[^'\\\\\\n]|\\\\.)*')"+  // 3 string
+  "|(@\\w+(?:\\.\\w+)*)"+                          // 4 decorator
+  "|(\\b0[xX][0-9a-fA-F_]+\\b|\\b0[oO][0-7_]+\\b|\\b0[bB][01_]+\\b|\\b\\d[\\d_]*(?:\\.[\\d_]+)?(?:[eE][+-]?\\d+)?\\b)"+ // 5 number
+  "|(\\b(?:def|class)\\s+\\w+)"+                   // 6 def/class + name
+  "|(\\b(?:"+PY_KEYWORDS.join("|")+")\\b)"+        // 7 keyword
+  "|(\\b(?:"+PY_BUILTINS.join("|")+")\\b)",        // 8 builtin
+  "g"
+);
+function highlightPython(src){
+  /* Walk matches manually so EVERY character (token and gap) is escaped
+     before going into innerHTML — never inject raw user text. */
+  let out="", last=0, m;
+  PY_TOKEN_RE.lastIndex=0;
+  while((m=PY_TOKEN_RE.exec(src))!==null){
+    out+=esc(src.slice(last,m.index));
+    const c=m[1], tr=m[2], s=m[3], dec=m[4], num=m[5], dc=m[6], kw=m[7], bi=m[8];
+    if(c)   out+='<span class="tok-c">'+esc(c)+'</span>';
+    else if(tr||s) out+='<span class="tok-s">'+esc(tr||s)+'</span>';
+    else if(dec) out+='<span class="tok-d">'+esc(dec)+'</span>';
+    else if(num) out+='<span class="tok-n">'+esc(num)+'</span>';
+    else if(dc){
+      const sp=dc.indexOf(" ");
+      out+='<span class="tok-k">'+esc(dc.slice(0,sp))+'</span> <span class="tok-f">'+esc(dc.slice(sp+1))+'</span>';
+    }
+    else if(kw) out+='<span class="tok-k">'+esc(kw)+'</span>';
+    else if(bi) out+='<span class="tok-b">'+esc(bi)+'</span>';
+    else out+=esc(m[0]);
+    last=m.index+m[0].length;
   }
-  ta.value=newVal;
-  ta.selectionStart=ta.selectionEnd=cursor;
-  ta.dispatchEvent(new Event("input",{bubbles:true}));
+  out+=esc(src.slice(last));
+  return out;
+}
+/* Wrap a code textarea in a highlighted overlay (transparent text on top of a
+   tokenized <pre>). Fully offline; scroll, resize and IME composition safe. */
+function enhanceEditor(ta){
+  if(ta.dataset.enhanced) return;
+  ta.dataset.enhanced="1";
+  const wrap=document.createElement("div");
+  wrap.className="ed-wrap";
+  const pre=document.createElement("pre");
+  pre.className="ed-highlight";
+  pre.setAttribute("aria-hidden","true");
+  ta.parentNode.insertBefore(wrap,ta);
+  wrap.appendChild(pre);
+  wrap.appendChild(ta);
+  const cs=getComputedStyle(ta);
+  ["padding","fontFamily","fontSize","lineHeight","letterSpacing","tabSize","borderRadius","fontWeight"].forEach(p=>{ pre.style[p]=cs[p]; });
+  /* the editor's top margin must live on the wrapper, or the absolutely
+     positioned overlay drifts 10px above the textarea's text */
+  wrap.style.marginTop=cs.marginTop;
+  ta.style.marginTop="0";
+  let rafId=null;
+  const render=()=>{
+    if(rafId) cancelAnimationFrame(rafId);
+    rafId=requestAnimationFrame(()=>{ pre.innerHTML=highlightPython(ta.value)+"\n"; });
+  };
+  ta.addEventListener("input",render);
+  ta.addEventListener("scroll",()=>{ pre.scrollTop=ta.scrollTop; pre.scrollLeft=ta.scrollLeft; });
+  if(typeof ResizeObserver!=="undefined"){
+    new ResizeObserver(()=>{ pre.scrollTop=ta.scrollTop; pre.scrollLeft=ta.scrollLeft; }).observe(ta);
+  }
+  /* IME (Chinese input): show the raw textarea text while composing so the
+     composition preview stays visible, then restore the highlight overlay */
+  ta.addEventListener("compositionstart",()=>{ pre.style.visibility="hidden"; ta.style.color=""; ta.style.webkitTextFillColor=""; });
+  ta.addEventListener("compositionend",()=>{ pre.style.visibility=""; ta.style.color="transparent"; ta.style.webkitTextFillColor="transparent"; render(); });
+  pre.innerHTML=highlightPython(ta.value)+"\n";   // first paint is synchronous
+}
+
+/* Editor shortcuts in ANY textarea: Tab = 4-space indent (multi-line aware),
+   Ctrl+/ = toggle Python comments on the selection. Both fire an input event
+   afterwards so save/autosave and the highlighter still run. */
+document.addEventListener("keydown",e=>{
+  if(e.target.tagName!=="TEXTAREA") return;
+  const ta=e.target, s=ta.selectionStart, en=ta.selectionEnd, val=ta.value;
+  if(e.key==="Tab" && !e.shiftKey){
+    e.preventDefault();
+    let newVal, cursor;
+    if(en>s && val.slice(s,en).indexOf("\n")!==-1){
+      const before=val.slice(0,s), sel=val.slice(s,en), after=val.slice(en);
+      const indented=sel.split("\n").map(l=>"    "+l).join("\n");
+      newVal=before+indented+after;
+      cursor=s+indented.length;
+    } else {
+      newVal=val.slice(0,s)+"    "+val.slice(en);
+      cursor=s+4;
+    }
+    ta.value=newVal;
+    ta.selectionStart=ta.selectionEnd=cursor;
+    ta.dispatchEvent(new Event("input",{bubbles:true}));
+    return;
+  }
+  if((e.ctrlKey||e.metaKey) && e.key==="/"){
+    e.preventDefault();
+    const startLine=val.lastIndexOf("\n",s-1)+1;
+    let endLine=val.indexOf("\n",en);
+    if(endLine===-1) endLine=val.length;
+    const lines=val.slice(startLine,endLine).split("\n");
+    const allCommented=lines.every(l=>/^\s*#/.test(l)||l.trim()==="");
+    const newBlock=lines.map(l=>{
+      if(allCommented) return l.replace(/^(\s*)#\s?/,"$1");
+      if(l.trim()==="") return l;
+      return l.replace(/^(\s*)/,"$1# ");
+    }).join("\n");
+    ta.value=val.slice(0,startLine)+newBlock+val.slice(endLine);
+    ta.selectionStart=startLine;
+    ta.selectionEnd=startLine+newBlock.length;
+    ta.dispatchEvent(new Event("input",{bubbles:true}));
+    return;
+  }
 });
 
 /* ================= AUTH (PostgreSQL-backed accounts) ================= */
